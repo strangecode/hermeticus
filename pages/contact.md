@@ -12,13 +12,13 @@ and contact details.
 
 | Day       | Hours        |
 | --------- | ------------ |
-| Monday    | _closed_     |
-| Tuesday   | 10:00&ndash;18:00 |
-| Wednesday | 10:00&ndash;18:00 |
-| Thursday  | 10:00&ndash;18:00 |
-| Friday    | 10:00&ndash;19:00 |
-| Saturday  | 10:00&ndash;19:00 |
-| Sunday    | 11:00&ndash;16:00 |
+| Monday    | 10:00&ndash;16:30 |
+| Tuesday   | 10:00&ndash;16:30 |
+| Wednesday | 10:00&ndash;16:30 |
+| Thursday  | 10:00&ndash;16:30 |
+| Friday    | 10:00&ndash;16:30 |
+| Saturday  | 11:00&ndash;16:30 |
+| Sunday    | _closed_     |
 
 ## Address
 
