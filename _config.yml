@@ -13,8 +13,8 @@ lang: en
 # path (e.g. "/hermeticus") for project pages. Keep both empty until the
 # final hosting path is decided; use `relative_url` in templates so the switch
 # is a one-line change.
-url: ""
-baseurl: ""
+url: "https://strangecode.github.io"
+baseurl: "/hermeticus"
 
 # Build configuration
 markdown: kramdown
