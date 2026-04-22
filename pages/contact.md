@@ -5,8 +5,6 @@ description: Opening hours, address, and how to get in touch with Hermeticus Boo
 permalink: /contact/
 ---
 
-Placeholder page. Replace with the shop&rsquo;s real address, opening hours,
-and contact details.
 
 ## Opening hours
 
@@ -22,9 +20,9 @@ and contact details.
 
 ## Address
 
-Placeholder address, City, Country.
+469 B Street, Ashland, Oregon 97520
 
 ## Get in touch
 
 - Email: _placeholder@example.com_
-- Phone: _+00 000 000 000_
+- Phone: (530) 693-5774
