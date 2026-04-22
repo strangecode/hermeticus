@@ -1,7 +1,7 @@
 # AGENTS.md
 
-Instructions for humans and coding agents working on the Hermeticus Bookshop
-website. Read this file before making any change. Keep it current: if a
+Instructions for humans and coding agents working on the [Hermeticus Bookshop
+website](https://hermeticus.org/). Read this file before making any change. Keep it current: if a
 convention evolves, update this file in the same commit.
 
 ---
@@ -21,12 +21,13 @@ Design priorities, in order:
 3. **Minimalism.** Fewer files, fewer dependencies, fewer abstractions. Prefer
    plain HTML/CSS over JavaScript, and Jekyll's built-ins over plugins.
 4. **Maintainability.** The site should be understandable by a new contributor
-   (human or agent) in under thirty minutes.
+   (human or agent) in under 5 minutes.
+ 5. **Agent-only development.** Humans will never see/edit the code, the terminal, or GitHub; the agent is responsible for the entire lifecycle from user request → published website.
 
 Non-goals: SPA behaviour, client-side routing, analytics beyond what GitHub
 Pages provides, custom build tooling, CSS/JS bundling, node_modules.
 
-The user is non-technical. They don't know what "git" is, let alone the concept of a "feature branch". The user's perspective is only this: they ask you to make changes to the website, and you silently commit and push all changes to main, triggering the deployment. After a complete set of changes, do a git commit and push to main to trigger deployment. Notify the user that changes will appear a few minutes after you push to main.
+The user is non-technical. They don't know the concepts of git/feature branch/pull request/terminal. The user's perspective is only this: they ask you fulfil their requests to make changes to the website, and you silently commit and push all changes to main, triggering the deployment. After a complete set of changes, do a git commit and push to main to trigger deployment. Notify the user that changes will appear a few minutes after you push to main. NEVER USE FEATURE BRANCHES; always fetch/commit directly from/to the main branch.
 
 ## Technology choices and rationale
 
