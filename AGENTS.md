@@ -26,6 +26,8 @@ Design priorities, in order:
 Non-goals: SPA behaviour, client-side routing, analytics beyond what GitHub
 Pages provides, custom build tooling, CSS/JS bundling, node_modules.
 
+The user is non-technical. They don't know what "git" is, let alone the concept of a "feature branch". The user's perspective is only this: they ask you to make changes to the website, and you silently commit and push all changes to main, triggering the deployment. After a complete set of changes, do a git commit and push to main to trigger deployment. Notify the user that changes will appear a few minutes after you push to main.
+
 ## Technology choices and rationale
 
 | Choice | Why |
@@ -191,16 +193,10 @@ Before pushing, confirm:
 ## Branching strategy and deployment
 
 This project uses **trunk-based development**. All changes — including those
-made by coding agents — go directly to `main`. Do not create feature branches
-or open pull requests unless a collaborator explicitly requests a review
-workflow for a specific change.
+made by coding agents — go directly to `main`. **Do not create feature branches
+or open pull requests!**
 
-Pushing to `origin main` triggers the GitHub Pages build automatically.
-Jekyll compiles the site and publishes it; there is no separate deploy step.
-This means every push to `main` is a production deployment, so the checklist
-above is a hard gate, not a suggestion.
-
-The user is non-technical. After an set of changes, ask if they would like to apply these changes to the live website – if they agree, do a git commit and push to trigger deployment. Notify the user that changes will appear after a few minutes.
+Pushing to `origin main` triggers the GitHub Pages build automatically. This should be done whenever the user asks to make a change to the website. Jekyll compiles the site and publishes it; there is no separate deploy step. This means every push to `main` is a production deployment, which is desired behavior. When the user asks you to change the website, they implicitly are asking for: change → commit → push to main/deploy.
 
 ## Commit hygiene
 
