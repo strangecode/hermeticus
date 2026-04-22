@@ -169,7 +169,7 @@ bundle exec jekyll serve --livereload
 # open http://127.0.0.1:4000/
 ```
 
-Before opening a PR, confirm:
+Before pushing, confirm:
 
 - [ ] `bundle exec jekyll build` completes without warnings.
 - [ ] Every new or changed page has `title` and `description` front matter.
@@ -181,7 +181,19 @@ Before opening a PR, confirm:
 - [ ] No new hard-coded colours, fonts, or spacing values — everything flows
       through `tokens.css`.
 
-## 10. Commit and PR hygiene
+## 10. Branching strategy and deployment
+
+This project uses **trunk-based development**. All changes — including those
+made by coding agents — go directly to `main`. Do not create feature branches
+or open pull requests unless a collaborator explicitly requests a review
+workflow for a specific change.
+
+Pushing to `origin main` triggers the GitHub Pages build automatically.
+Jekyll compiles the site and publishes it; there is no separate deploy step.
+This means every push to `main` is a production deployment, so the checklist
+above is a hard gate, not a suggestion.
+
+## 11. Commit hygiene
 
 - Small, focused commits. One logical change per commit.
 - Imperative commit subjects ("Add events page", not "Added…" or "Adding…").
