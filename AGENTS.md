@@ -166,7 +166,7 @@ Prerequisites: Ruby ≥ 3.1, Bundler.
 ```sh
 bundle install
 bundle exec jekyll serve --livereload
-# open http://127.0.0.1:4000/
+# open http://127.0.0.1:4000/hermeticus/
 ```
 
 Before pushing, confirm:
