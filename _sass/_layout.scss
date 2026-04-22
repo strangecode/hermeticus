@@ -159,6 +159,8 @@
   max-width: var(--prose-max);
 }
 
+.prose li + li { margin-top: var(--space-2); }
+
 /* Grid helper */
 .grid {
   display: grid;
