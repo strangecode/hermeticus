@@ -55,13 +55,15 @@ explain why. Do not silently introduce a new framework, bundler, or runtime.
 ├── _layouts/
 │   ├── default.html       # Base layout: skip link, header, <main>, footer.
 │   └── page.html          # Extends default; adds page title and prose.
+├── _sass/                 # Sass partials — compiled by Jekyll, not served directly.
+│   ├── _tokens.scss       # Design tokens (colours, spacing, type).
+│   ├── _base.scss         # Reset, element defaults, typography.
+│   ├── _layout.scss       # Header, footer, page shell, grid helpers.
+│   └── _components.scss   # Reusable components (button, card, etc.).
 ├── assets/
 │   ├── css/
-│   │   ├── tokens.css     # Design tokens (colours, spacing, type).
-│   │   ├── base.css       # Reset, element defaults, typography.
-│   │   ├── layout.css     # Header, footer, page shell, grid helpers.
-│   │   ├── components.css # Reusable components (button, card, etc.).
-│   │   └── main.css       # Imports the above in order.
+│   │   └── main.scss      # Entry point — imports the _sass partials.
+│   │                      # Jekyll compiles this to main.css at build time.
 │   └── js/
 │       └── main.js        # Optional progressive enhancement only.
 ├── pages/                 # Top-level pages authored in Markdown.
@@ -103,9 +105,14 @@ semantics cannot be expressed in Markdown (landing hero, complex forms, etc.).
 
 ## 5. Design system
 
-All visual decisions must go through `assets/css/tokens.css`. A page or
+All visual decisions must go through `_sass/_tokens.scss`. A page or
 component may **not** hard-code a colour, font, size, radius, or shadow; it
 must reference a `var(--token)`.
+
+CSS is authored in the `_sass/` directory as Sass partials (plain CSS syntax,
+no Sass-specific features needed). Jekyll compiles them into a single
+`assets/css/main.css` at build time — no runtime `@import` requests, no
+bundler required.
 
 Token categories already scaffolded (values are intentionally neutral
 placeholders until brand guidance arrives):
@@ -120,7 +127,7 @@ placeholders until brand guidance arrives):
 - **Radius, shadow, border, motion** — one token per tier; extend with care.
 
 When brand guidance arrives, the expected change is: update values in
-`tokens.css`. Avoid touching component CSS for purely visual changes.
+`_sass/_tokens.scss`. Avoid touching component CSS for purely visual changes.
 
 ## 6. Accessibility rules (non-negotiable)
 
@@ -179,7 +186,7 @@ Before pushing, confirm:
       order and the focus indicator is always visible.
 - [ ] `prefers-reduced-motion: reduce` disables non-essential motion.
 - [ ] No new hard-coded colours, fonts, or spacing values — everything flows
-      through `tokens.css`.
+      through `_sass/_tokens.scss`.
 
 ## 10. Branching strategy and deployment
 
@@ -206,5 +213,5 @@ above is a hard gate, not a suggestion.
 - Prefer semantic HTML.
 - Prefer Jekyll's built-ins over plugins.
 - Prefer CSS over JavaScript.
-- Prefer updating `tokens.css` over touching component CSS.
+- Prefer updating `_sass/_tokens.scss` over touching component CSS.
 - Prefer asking in an issue over introducing a new dependency.

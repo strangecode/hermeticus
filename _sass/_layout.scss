@@ -1,28 +1,27 @@
 /* =========================================================================
-   Layout
-   -------------------------------------------------------------------------
-   Page shell, header, footer, and generic container utilities.
+   Layout — page shell, header, footer, containers
    =======================================================================*/
 
-/* Skip link — visible on focus only */
+/* Skip link */
 .skip-link {
   position: absolute;
   left: var(--space-4);
   top: var(--space-4);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   background-color: var(--color-accent);
   color: var(--color-accent-ink);
   border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: var(--step--1);
+  text-decoration: none;
   transform: translateY(-200%);
   transition: transform var(--duration-fast) var(--easing-standard);
   z-index: 100;
 }
 
-.skip-link:focus {
-  transform: translateY(0);
-}
+.skip-link:focus { transform: translateY(0); }
 
-/* Containers */
+/* Container */
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -36,14 +35,15 @@
   padding-block: var(--space-7);
 }
 
-.site-main:focus {
-  outline: none; /* <main tabindex="-1"> shouldn't draw a ring on click */
-}
+.site-main:focus { outline: none; }
 
-/* Header */
+/* ---- Header ---------------------------------------------------------- */
 .site-header {
-  border-bottom: var(--border-thin);
   background-color: var(--color-bg);
+  border-bottom: var(--border-thin);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .site-header__inner {
@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
-  min-height: 4rem;
+  min-height: 3.5rem;
   flex-wrap: wrap;
 }
 
@@ -61,9 +61,10 @@
   font-family: var(--font-heading);
   font-weight: var(--weight-bold);
   font-size: var(--step-1);
+  letter-spacing: -0.01em;
 }
 
-.site-brand:hover { text-decoration: none; }
+.site-brand:hover { color: var(--color-accent); text-decoration: none; }
 
 /* Primary nav */
 .site-nav__list {
@@ -72,36 +73,46 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5);
+  gap: var(--space-2);
 }
 
 .site-nav__item { margin: 0; }
 
 .site-nav__link {
-  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  color: var(--color-text-muted);
   text-decoration: none;
   font-family: var(--font-heading);
-  padding: var(--space-2) 0;
-  display: inline-block;
-  min-height: 44px;
-  line-height: calc(44px - var(--space-4));
+  font-size: var(--step--1);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast) var(--easing-standard),
+              background-color var(--duration-fast) var(--easing-standard);
 }
 
-.site-nav__link:hover { text-decoration: underline; }
+.site-nav__link:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  text-decoration: none;
+}
 
 .site-nav__link.is-current {
-  text-decoration: underline;
-  text-decoration-thickness: 0.12em;
-  text-underline-offset: 0.25em;
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
 }
 
-/* Footer */
+/* ---- Footer ---------------------------------------------------------- */
 .site-footer {
   border-top: var(--border-thin);
   background-color: var(--color-surface);
   padding-block: var(--space-6);
   color: var(--color-text-muted);
   font-size: var(--step--1);
+  font-family: var(--font-heading);
 }
 
 .site-footer__inner {
@@ -120,45 +131,42 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .site-footer a {
   color: var(--color-text-muted);
+  text-decoration: none;
 }
 
-/* Page shell */
-.page__header {
-  margin-bottom: var(--space-6);
-}
+.site-footer a:hover { color: var(--color-accent); }
 
-.page__title {
-  margin-top: 0;
-}
+/* ---- Page layout ----------------------------------------------------- */
+.page { max-width: var(--container-max); }
+
+.page__header { margin-bottom: var(--space-6); }
+
+.page__title { margin-top: 0; }
 
 .page__subtitle {
   color: var(--color-text-muted);
   font-size: var(--step-1);
-  margin: 0;
+  margin: calc(var(--space-2) * -1) 0 0;
 }
 
-/* Prose — constrain reading width for comfortable line length */
+/* Prose */
 .prose {
   max-width: var(--prose-max);
 }
 
-.prose > * + * {
-  margin-top: var(--space-4);
-}
-
-/* Generic grid helper for future use (card rows, etc.) */
+/* Grid helper */
 .grid {
   display: grid;
   gap: var(--space-5);
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
 }
 
-/* Visually hidden content still announced to screen readers */
+/* Visually hidden */
 .visually-hidden {
   position: absolute !important;
   width: 1px;

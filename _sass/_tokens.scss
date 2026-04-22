@@ -1,0 +1,91 @@
+/* =========================================================================
+   Design tokens
+   -------------------------------------------------------------------------
+   Every visual value flows through here. Update this file when brand
+   guidance arrives — component CSS should not need to change.
+   =======================================================================*/
+
+:root {
+  /* Colour — light theme */
+  --color-bg:          #faf8f5;
+  --color-surface:     #f0ece4;
+  --color-text:        #1c1a17;
+  --color-text-muted:  #6b6257;
+  --color-border:      #ddd8cf;
+  --color-accent:      #7a5230;
+  --color-accent-hover:#5e3d22;
+  --color-accent-ink:  #ffffff;
+  --color-focus-ring:  #2b6cb0;
+
+  --color-success: #2f7a3a;
+  --color-warning: #8a6d1f;
+  --color-danger:  #9b2c2c;
+
+  /* Typography */
+  --font-sans:    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif:   Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --font-body:    var(--font-serif);
+  --font-heading: var(--font-sans);
+
+  /* Fluid type scale */
+  --step--1: clamp(0.83rem, 0.80rem + 0.15vw, 0.92rem);
+  --step-0:  clamp(1.00rem, 0.96rem + 0.20vw, 1.10rem);
+  --step-1:  clamp(1.20rem, 1.14rem + 0.30vw, 1.38rem);
+  --step-2:  clamp(1.44rem, 1.35rem + 0.45vw, 1.73rem);
+  --step-3:  clamp(1.73rem, 1.60rem + 0.65vw, 2.16rem);
+  --step-4:  clamp(2.07rem, 1.89rem + 0.90vw, 2.70rem);
+  --step-5:  clamp(2.49rem, 2.23rem + 1.30vw, 3.38rem);
+
+  --line-height-tight:  1.2;
+  --line-height-normal: 1.6;
+  --line-height-loose:  1.8;
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-bold:    700;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* Layout */
+  --container-max: 72rem;
+  --prose-max:     40rem;
+
+  /* Radius, border, shadow */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+
+  --border-thin:  1px solid var(--color-border);
+
+  --shadow-sm: 0 1px 3px rgba(60, 40, 10, 0.07);
+  --shadow-md: 0 4px 12px rgba(60, 40, 10, 0.10);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:          #141210;
+    --color-surface:     #1e1c18;
+    --color-text:        #f0ece4;
+    --color-text-muted:  #b0a898;
+    --color-border:      #302c26;
+    --color-accent:      #c9935a;
+    --color-accent-hover:#e0aa72;
+    --color-accent-ink:  #1a1510;
+    --color-focus-ring:  #90cdf4;
+  }
+}

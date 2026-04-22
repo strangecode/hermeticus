@@ -1,8 +1,0 @@
----
-# Front matter makes Jekyll process this file so @import works with
-# `relative_url`. Keep this file tiny; it's just an import manifest.
----
-@import url("{{ '/assets/css/tokens.css' | relative_url }}");
-@import url("{{ '/assets/css/base.css' | relative_url }}");
-@import url("{{ '/assets/css/layout.css' | relative_url }}");
-@import url("{{ '/assets/css/components.css' | relative_url }}");

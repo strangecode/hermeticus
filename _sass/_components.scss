@@ -1,12 +1,8 @@
 /* =========================================================================
-   Components
-   -------------------------------------------------------------------------
-   Small, reusable building blocks. Keep each component's surface area
-   minimal — one file, one class prefix. Extend by adding more components;
-   do not over-parameterise an existing one.
+   Components — reusable building blocks
    =======================================================================*/
 
-/* Button */
+/* ---- Button ---------------------------------------------------------- */
 .button {
   display: inline-flex;
   align-items: center;
@@ -16,8 +12,9 @@
   min-height: 44px;
   font-family: var(--font-heading);
   font-weight: var(--weight-medium);
-  font-size: var(--step-0);
-  line-height: 1;
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   background-color: var(--color-accent);
   color: var(--color-accent-ink);
   border: 2px solid transparent;
@@ -29,40 +26,54 @@
     transform var(--duration-fast) var(--easing-standard);
 }
 
-.button:hover { text-decoration: none; filter: brightness(0.95); }
+.button:hover {
+  background-color: var(--color-accent-hover);
+  color: var(--color-accent-ink);
+  text-decoration: none;
+}
+
 .button:active { transform: translateY(1px); }
 
 .button--ghost {
   background-color: transparent;
   color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.button--ghost:hover {
+  background-color: var(--color-surface);
+  color: var(--color-text);
   border-color: var(--color-text);
 }
 
-.button--ghost:hover { background-color: var(--color-surface); }
-
-/* Card */
+/* ---- Card ------------------------------------------------------------ */
 .card {
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
   border: var(--border-thin);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--space-5) var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
 }
 
 .card__title {
   font-family: var(--font-heading);
-  font-size: var(--step-2);
+  font-size: var(--step-1);
+  font-weight: var(--weight-bold);
   margin: 0;
 }
 
 .card__meta {
   color: var(--color-text-muted);
   font-size: var(--step--1);
+  font-family: var(--font-heading);
 }
 
-/* Tag / badge */
+.card p { margin: 0; }
+
+/* ---- Tag ------------------------------------------------------------- */
 .tag {
   display: inline-block;
   padding: var(--space-1) var(--space-3);
@@ -70,32 +81,34 @@
   border: var(--border-thin);
   border-radius: 999px;
   font-size: var(--step--1);
+  font-family: var(--font-heading);
   color: var(--color-text-muted);
 }
 
-/* Callout / notice */
+/* ---- Callout --------------------------------------------------------- */
 .callout {
   padding: var(--space-4) var(--space-5);
-  border-left: 4px solid var(--color-accent);
+  border-left: 3px solid var(--color-accent);
   background-color: var(--color-surface);
-  border-radius: var(--radius-md);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 .callout--warning { border-left-color: var(--color-warning); }
 .callout--danger  { border-left-color: var(--color-danger);  }
 .callout--success { border-left-color: var(--color-success); }
 
-/* Form controls */
+/* ---- Form controls --------------------------------------------------- */
 .field {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .field__label {
   font-family: var(--font-heading);
   font-weight: var(--weight-medium);
+  font-size: var(--step--1);
 }
 
 .field__control {
@@ -105,6 +118,7 @@
   background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 44px;
+  transition: border-color var(--duration-fast) var(--easing-standard);
 }
 
 .field__control:focus-visible {
@@ -114,17 +128,23 @@
 .field__hint {
   color: var(--color-text-muted);
   font-size: var(--step--1);
+  font-family: var(--font-heading);
 }
 
-/* Hero — home page introduction */
+/* ---- Hero ------------------------------------------------------------ */
 .hero {
   padding-block: var(--space-8);
   text-align: center;
+  border-bottom: var(--border-thin);
+  background-color: var(--color-surface);
 }
 
 .hero__title {
   margin-top: 0;
+  margin-bottom: var(--space-4);
   font-size: var(--step-5);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
 }
 
 .hero__lede {
@@ -132,6 +152,8 @@
   margin-inline: auto;
   color: var(--color-text-muted);
   font-size: var(--step-1);
+  line-height: var(--line-height-loose);
+  margin-bottom: 0;
 }
 
 .hero__actions {
@@ -139,18 +161,18 @@
   justify-content: center;
   gap: var(--space-4);
   flex-wrap: wrap;
-  margin-top: var(--space-5);
+  margin-top: var(--space-6);
 }
 
-/* Section — generic spacing for stacked homepage sections */
+/* ---- Section --------------------------------------------------------- */
 .section {
   padding-block: var(--space-7);
 }
 
-.section + .section {
-  border-top: var(--border-thin);
-}
-
 .section__title {
   margin-top: 0;
+  margin-bottom: var(--space-5);
 }
+
+/* ---- Home page ------------------------------------------------------- */
+.home .section { background-color: var(--color-bg); }
