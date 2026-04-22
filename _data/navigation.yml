@@ -1,0 +1,12 @@
+# Single source of truth for the primary navigation.
+# Order here is the order users see.
+# Each item: { title, url }.
+# `url` is relative to the site root; it will be passed through `relative_url`.
+- title: Books
+  url: /books/
+- title: Events
+  url: /events/
+- title: About
+  url: /about/
+- title: Visit
+  url: /contact/

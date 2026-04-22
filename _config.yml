@@ -1,0 +1,60 @@
+# Site metadata
+title: Hermeticus Bookshop
+tagline: An independent bookshop.
+description: >-
+  Hermeticus is an independent bookshop. Browse the catalogue, find upcoming
+  events, and learn how to visit us.
+author: Hermeticus Bookshop
+lang: en
+
+# URL configuration
+# `url` should be set to the production origin (e.g. https://example.com) when
+# known. `baseurl` is empty for user/organisation pages and a leading-slash
+# path (e.g. "/hermeticus") for project pages. Keep both empty until the
+# final hosting path is decided; use `relative_url` in templates so the switch
+# is a one-line change.
+url: ""
+baseurl: ""
+
+# Build configuration
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+permalink: /:title/
+timezone: Etc/UTC
+
+# Default front matter
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: page
+
+# Collections / source layout
+include:
+  - pages
+
+exclude:
+  - AGENTS.md
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - node_modules
+  - .github
+  - .gitignore
+
+# GitHub Pages default-safe plugins only.
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-feed
+
+# jekyll-seo-tag settings
+social:
+  name: Hermeticus Bookshop
+  links: []

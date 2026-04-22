@@ -1,0 +1,14 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+
+{%- comment -%}
+  `jekyll-seo-tag` renders <title>, meta description, Open Graph, and
+  Twitter cards from site/page front matter. Keep page front matter rich
+  (title + description) and this include stays lean.
+{%- endcomment -%}
+{%- seo -%}
+
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+<link rel="icon" href="{{ '/favicon.ico' | relative_url }}" sizes="any">
+<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">

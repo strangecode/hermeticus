@@ -1,0 +1,14 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner container">
+    <p class="site-footer__copy">
+      &copy; {{ 'now' | date: '%Y' }} {{ site.title }}.
+    </p>
+    <nav class="site-footer__nav" aria-label="Footer">
+      <ul class="site-footer__list">
+        {%- for item in site.data.navigation -%}
+          <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</footer>

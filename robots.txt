@@ -1,0 +1,8 @@
+---
+# Front matter keeps Jekyll from treating this as a static file, so
+# `{{ '/sitemap.xml' | absolute_url }}` is resolved correctly.
+---
+User-agent: *
+Allow: /
+
+Sitemap: {{ '/sitemap.xml' | absolute_url }}
