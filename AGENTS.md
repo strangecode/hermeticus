@@ -6,7 +6,7 @@ convention evolves, update this file in the same commit.
 
 ---
 
-## 1. Project overview
+## Project overview
 
 Hermeticus Bookshop is a small, static marketing website for a bookshop. It is
 hosted on **GitHub Pages** from the default branch of this repository, and it
@@ -26,7 +26,7 @@ Design priorities, in order:
 Non-goals: SPA behaviour, client-side routing, analytics beyond what GitHub
 Pages provides, custom build tooling, CSS/JS bundling, node_modules.
 
-## 2. Technology choices and rationale
+## Technology choices and rationale
 
 | Choice | Why |
 | --- | --- |
@@ -39,7 +39,7 @@ Pages provides, custom build tooling, CSS/JS bundling, node_modules.
 If you believe one of these choices needs to change, open an issue first and
 explain why. Do not silently introduce a new framework, bundler, or runtime.
 
-## 3. Repository layout
+## Repository layout
 
 ```
 .
@@ -80,7 +80,7 @@ explain why. Do not silently introduce a new framework, bundler, or runtime.
 Content lives in Markdown whenever possible. Only reach for raw HTML when the
 semantics cannot be expressed in Markdown (landing hero, complex forms, etc.).
 
-## 4. Adding a new page
+## Adding a new page
 
 1. Create a Markdown file in `pages/` (or at the repo root for the home page).
 2. Add front matter:
@@ -103,7 +103,7 @@ semantics cannot be expressed in Markdown (landing hero, complex forms, etc.).
 5. Verify locally (see §9) and check the page with a keyboard and a screen
    reader emulator.
 
-## 5. Design system
+## Design system
 
 All visual decisions must go through `_sass/_tokens.scss`. A page or
 component may **not** hard-code a colour, font, size, radius, or shadow; it
@@ -129,7 +129,7 @@ placeholders until brand guidance arrives):
 When brand guidance arrives, the expected change is: update values in
 `_sass/_tokens.scss`. Avoid touching component CSS for purely visual changes.
 
-## 6. Accessibility rules (non-negotiable)
+## Accessibility rules (non-negotiable)
 
 - Every page starts with a "Skip to content" link that jumps to `<main>`.
 - Use semantic HTML: `<header>`, `<nav>`, `<main>`, `<footer>`, `<article>`,
@@ -147,7 +147,7 @@ When brand guidance arrives, the expected change is: update values in
 - Forms: every input has an associated `<label>`. Required fields are marked
   both visually and via `aria-required`.
 
-## 7. Content and SEO
+## Content and SEO
 
 - Every page sets `title` and `description` in front matter.
 - Use descriptive link text ("Browse our poetry shelf", not "click here").
@@ -158,7 +158,7 @@ When brand guidance arrives, the expected change is: update values in
 - `sitemap.xml` and `robots.txt` are provided; `jekyll-sitemap` keeps the
   sitemap up to date automatically. New pages need no extra work.
 
-## 8. JavaScript policy
+## JavaScript policy
 
 - The site must render and be fully usable with JavaScript disabled.
 - `assets/js/main.js` is reserved for progressive enhancement (e.g. a mobile
@@ -166,7 +166,7 @@ When brand guidance arrives, the expected change is: update values in
 - No third-party scripts without explicit approval in an issue. No analytics,
   tag managers, or embeds that phone home by default.
 
-## 9. Local preview and validation
+## Local preview and validation
 
 Prerequisites: Ruby ≥ 3.1, Bundler.
 
@@ -188,7 +188,7 @@ Before pushing, confirm:
 - [ ] No new hard-coded colours, fonts, or spacing values — everything flows
       through `_sass/_tokens.scss`.
 
-## 10. Branching strategy and deployment
+## Branching strategy and deployment
 
 This project uses **trunk-based development**. All changes — including those
 made by coding agents — go directly to `main`. Do not create feature branches
@@ -200,14 +200,17 @@ Jekyll compiles the site and publishes it; there is no separate deploy step.
 This means every push to `main` is a production deployment, so the checklist
 above is a hard gate, not a suggestion.
 
-## 11. Commit hygiene
+The user is non-technical. After an set of changes, ask if they would like to apply these changes to the live website – if they agree, do a git commit and push to trigger deployment. Notify the user that changes will appear after a few minutes.
+
+## Commit hygiene
 
 - Small, focused commits. One logical change per commit.
 - Imperative commit subjects ("Add events page", not "Added…" or "Adding…").
 - Reference the section of this file you are changing if a convention moves.
 - Do not commit generated output (`_site/`), editor files, or OS cruft.
+- Proactively commit code when reaching a natural stopping point. Push code only when features are stable and complete.
 
-## 11. When in doubt
+## When in doubt
 
 - Prefer the simpler option.
 - Prefer semantic HTML.
@@ -215,3 +218,20 @@ above is a hard gate, not a suggestion.
 - Prefer CSS over JavaScript.
 - Prefer updating `_sass/_tokens.scss` over touching component CSS.
 - Prefer asking in an issue over introducing a new dependency.
+
+## Project Planning
+
+This project uses a formal project planning system. Use it for all non-trivial work. Before updating plans or documentation, load the `project-planning` skill.
+
+| Document | Purpose |
+|---|---|
+| `plans/queue/` | Plans not yet started |
+| `plans/active/` | Plans in progress |
+| `plans/archive/` | Completed plans |
+| `plans/progress.md` | Concise outcome summaries |
+| `docs/architecture.md` | Current stable technical map of the system |
+| `docs/decisions.md` | Durable rationale log for technical decisions |
+
+- Plan IDs (`P-xxx`) must be unique.
+- Perform a plan review before coding.
+- These are living documents that must stay current as work progresses.
