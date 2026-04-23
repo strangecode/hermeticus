@@ -75,3 +75,8 @@ Suggested entry format:
 - summary: Applied a small post-deploy polish to the cart and results copy so restored carts no longer show the empty-state prompt, cart totals now read `item/items` with a divider, and sort-only changes keep the “showing all” wording.
 - reason: Live review surfaced three small copy and presentation regressions that were easier to fix in one follow-up pass than leave in production.
 - follow-up: Publish the polish commit to `main` and leave the plan active until you confirm the overall work is complete.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Removed the duplicate empty-result announcement by blanking the compact results line whenever the dedicated empty-state callout is shown.
+- reason: The books page was saying “No books match…” twice for the same no-results state.
+- follow-up: Publish this small follow-up fix to `main` and keep the plan active until you confirm the full catalog polish is done.

@@ -225,7 +225,7 @@
     }
 
     if (visibleCount === 0) {
-      return "No books match the current search and filter.";
+      return "";
     }
 
     return (
