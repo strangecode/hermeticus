@@ -312,6 +312,8 @@ If the user later wants a different priority order, or extra metadata, record th
 - 2026-04-23: Using image anchors as the clickable affordance gives the required raw-image fallback for free when `<dialog>` is unavailable or `showModal()` fails, which is simpler than building a separate fallback path in script.
 - 2026-04-23: The worker payload shape should be normalized once on load before rendering so optional strings and image arrays cannot break the client UI when a Square record is sparse.
 - 2026-04-23: Catalog-specific `display` rules overrode the native `hidden` attribute on the empty state and reset button. Adding `.catalog-app [hidden] { display: none !important; }` restored the intended behavior without restructuring the markup.
+- 2026-04-23: Post-release review found three small client regressions: restored carts kept the placeholder empty-cart message, the cart total block needed stronger separation from line items, and result-count copy should stay in the “showing all” form when only sort order changes.
+- 2026-04-23: Clearing the restored-cart placeholder should not depend on exact text matching because the seeded HTML message includes surrounding whitespace from markup formatting. Blank the cart message whenever a populated cart renders and let action-specific calls restore messages afterward.
 
 ## Decision Log
 
@@ -333,3 +335,5 @@ Implementation is nearly complete. The current working approach keeps the entire
 - 2026-04-23: Implemented the first code pass for browse controls, cart persistence, add-to-cart simplification, result messaging, responsive catalog styling, and the minimal image lightbox.
 - 2026-04-23: Fixed the hidden-state regression discovered in browser validation and moved disabled checkout styling into the shared button primitive.
 - 2026-04-23: Updated the stable architecture and ADR docs to capture browser-side cart persistence and live-catalog reconciliation as the durable approach for `/books/`.
+- 2026-04-23: Began a follow-up polish pass for empty-cart message clearing, cart-total wording and separation, and sort-only result-count copy.
+- 2026-04-23: Completed the follow-up polish pass and revalidated the restored-cart message, item/item summary wording, divider styling, and sort-only result-count copy in the local preview.

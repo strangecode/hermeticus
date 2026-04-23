@@ -70,3 +70,8 @@ Suggested entry format:
 - summary: Validated the refreshed `/books/` flow in Docker and a local browser, fixed a hidden-state regression discovered during that pass, and updated the durable docs to treat browser-side cart persistence as part of the stable catalog architecture.
 - reason: The first browser pass exposed one real UI regression and confirmed that cart continuity now changes the stable shape of the books page.
 - follow-up: Commit and push the validated change set to `main`, then wait for the GitHub Pages deploy to publish.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Applied a small post-deploy polish to the cart and results copy so restored carts no longer show the empty-state prompt, cart totals now read `item/items` with a divider, and sort-only changes keep the “showing all” wording.
+- reason: Live review surfaced three small copy and presentation regressions that were easier to fix in one follow-up pass than leave in production.
+- follow-up: Publish the polish commit to `main` and leave the plan active until you confirm the overall work is complete.

@@ -220,7 +220,7 @@
   }
 
   function buildResultsSummary(visibleCount) {
-    if (visibleCount === state.catalog.length && !hasActiveBrowseControls()) {
+    if (visibleCount === state.catalog.length && !hasActiveNarrowingControls()) {
       return visibleCount === 1 ? "Showing 1 book." : "Showing all " + visibleCount + " books.";
     }
 
@@ -391,10 +391,12 @@
     cartSummaryNode.textContent =
       totalCount === 0
         ? ""
-        : totalCount + (totalCount === 1 ? " book" : " books") + " • " + formatPrice(totalPrice);
+        : totalCount + (totalCount === 1 ? " item" : " items") + " • " + formatPrice(totalPrice);
 
     if (totalCount === 0) {
       showCartMessage(EMPTY_CART_MESSAGE);
+    } else {
+      showCartMessage("");
     }
   }
 
@@ -639,6 +641,10 @@
     return Boolean(
       state.browse.search || state.browse.category || state.browse.sort !== DEFAULT_SORT,
     );
+  }
+
+  function hasActiveNarrowingControls() {
+    return Boolean(state.browse.search || state.browse.category);
   }
 
   function isCatalogItem(item) {

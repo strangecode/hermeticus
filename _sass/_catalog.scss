@@ -214,6 +214,15 @@
   margin: 0;
 }
 
+.catalog-cart__summary {
+  padding-top: var(--space-3);
+  border-top: var(--border-thin);
+}
+
+.catalog-cart__summary:empty {
+  display: none;
+}
+
 .catalog-cart__items {
   list-style: none;
   margin: 0;
