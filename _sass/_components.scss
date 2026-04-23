@@ -126,6 +126,10 @@
   transition: border-color var(--duration-fast) var(--easing-standard);
 }
 
+select.field__control {
+  block-size: calc((var(--space-3) * 2) + 1.5em);
+}
+
 .field__control:focus-visible {
   border-color: var(--color-focus-ring);
 }
