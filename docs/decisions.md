@@ -35,3 +35,8 @@ Consequences: Checkout UX lives partly off-site on Square, but the implementatio
 Context: The first version should avoid ambiguous pricing and availability while still supporting one-of-a-kind books and low-volume stock.
 Decision: Show only items that have exactly one sellable variation, a positive price, and positive tracked inventory at one configured Square location.
 Consequences: Sellers must keep inventory tracking enabled for books they want online, and multi-variation items are intentionally excluded until a later revision.
+
+## 2026-04-23 – Keep cart continuity client-side and disposable
+Context: The books page needed a more forgiving shopping flow, but this site remains a static Jekyll frontend with a tiny low-volume catalog and no appetite for extra backend state.
+Decision: Persist the cart only in browser `localStorage`, reconcile it against the latest live catalog on load, and silently discard invalid saved lines instead of introducing server-side cart storage or elaborate recovery flows.
+Consequences: Buyers keep their place across reloads with minimal implementation complexity, but cart state remains device-local and should always be treated as convenience state rather than authoritative inventory state.

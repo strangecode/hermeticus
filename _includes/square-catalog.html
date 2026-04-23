@@ -3,19 +3,66 @@
   data-catalog-root
   data-api-base="{{ site.square_catalog_api_base | escape }}"
 >
-  <div class="catalog-app__status callout" data-catalog-status>
+  <div class="catalog-app__status callout" data-catalog-status role="status" aria-live="polite">
     Loading the catalog…
   </div>
 
   <div class="catalog-app__layout" data-catalog-layout hidden>
-    <div class="catalog-grid" data-catalog-grid aria-live="polite"></div>
+    <div class="catalog-browser">
+      <form class="catalog-controls" data-catalog-controls>
+        <div class="field catalog-controls__field">
+          <label class="field__label" for="catalog-search">Search</label>
+          <input
+            id="catalog-search"
+            class="field__control"
+            type="search"
+            name="search"
+            autocomplete="off"
+            placeholder="Title, category, or description"
+            data-catalog-search
+          >
+        </div>
+
+        <div class="field catalog-controls__field">
+          <label class="field__label" for="catalog-category">Category</label>
+          <select id="catalog-category" class="field__control" name="category" data-catalog-category>
+            <option value="">All categories</option>
+          </select>
+        </div>
+
+        <div class="field catalog-controls__field">
+          <label class="field__label" for="catalog-sort">Sort</label>
+          <select id="catalog-sort" class="field__control" name="sort" data-catalog-sort>
+            <option value="category">Category</option>
+            <option value="title">Title</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+          </select>
+        </div>
+
+        <div class="catalog-controls__actions">
+          <button class="button button--ghost" type="reset" data-catalog-reset hidden>Reset</button>
+        </div>
+      </form>
+
+      <p class="catalog-results" data-catalog-results role="status" aria-live="polite"></p>
+
+      <div class="catalog-empty callout" data-catalog-empty hidden>
+        <p class="catalog-empty__title">No books match the current view.</p>
+        <p class="catalog-empty__body">
+          Try a different search, choose another category, or reset the filters.
+        </p>
+      </div>
+
+      <div class="catalog-grid" data-catalog-grid></div>
+    </div>
 
     <aside class="catalog-cart" data-catalog-cart aria-labelledby="catalog-cart-title">
       <div class="catalog-cart__header">
         <p class="catalog-cart__eyebrow">Your selections</p>
         <h3 id="catalog-cart-title" class="catalog-cart__title">Cart</h3>
       </div>
-      <p class="catalog-cart__message" data-cart-message>
+      <p class="catalog-cart__message" data-cart-message role="status" aria-live="polite">
         Add a book to begin checkout.
       </p>
       <ul class="catalog-cart__items" data-cart-items></ul>
@@ -23,6 +70,16 @@
       <button class="button catalog-cart__checkout" type="button" data-cart-checkout disabled>Checkout</button>
     </aside>
   </div>
+
+  <dialog class="catalog-lightbox" data-catalog-lightbox aria-labelledby="catalog-lightbox-title">
+    <form class="catalog-lightbox__close-wrap" method="dialog">
+      <button class="button button--ghost catalog-lightbox__close" type="submit">Close</button>
+    </form>
+    <figure class="catalog-lightbox__figure">
+      <img class="catalog-lightbox__image" data-lightbox-image alt="">
+      <figcaption id="catalog-lightbox-title" class="catalog-lightbox__caption" data-lightbox-caption></figcaption>
+    </figure>
+  </dialog>
 
   <noscript>
     <div class="callout">

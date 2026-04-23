@@ -34,7 +34,7 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
 
 1. A visitor opens `/books/` on `hermeticus.org`.
 2. The static page shell from `pages/books.md` and `_includes/square-catalog.html` loads.
-3. `assets/js/main.js` reads `square_catalog_api_base` from `_config.yml` and requests `GET <worker>/catalog`.
+3. `assets/js/main.js` reads `square_catalog_api_base` from `_config.yml`, restores any previously saved cart lines from browser `localStorage`, and requests `GET <worker>/catalog`.
 4. The worker checks Cloudflare edge cache.
 5. On a cache miss, the worker:
    - paginates through Square `ListCatalog` for `ITEM`, `CATEGORY`, and `IMAGE`
@@ -42,10 +42,12 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
    - retrieves inventory counts for candidate variation IDs at `SQUARE_LOCATION_ID`
    - returns a compact JSON array with short keys
    - caches that response at Cloudflare
-6. The browser renders cards with category, gallery images, description, price, stock count, and add-to-cart controls.
-7. When the buyer checks out, `assets/js/main.js` sends `POST <worker>/checkout` with variation IDs and requested quantities.
-8. The worker bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, and creates a Square-hosted payment link.
-9. The browser redirects the buyer to Square’s checkout page.
+6. The browser renders cards with category, image links, description, price, stock count, browse controls, and add-to-cart controls.
+7. Client-side search, category filtering, and sorting run entirely against the already loaded catalog array without further network requests.
+8. The browser persists cart lines in `localStorage`, reconciles them against the freshly loaded catalog on page load, and silently drops lines that are no longer valid.
+9. When the buyer checks out, `assets/js/main.js` sends `POST <worker>/checkout` with variation IDs and requested quantities.
+10. The worker bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, and creates a Square-hosted payment link.
+11. The browser redirects the buyer to Square’s checkout page. On a `?checkout=success` return, the client clears the saved cart and shows a success message.
 
 The public catalog payload uses these keys:
 
@@ -64,6 +66,7 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 
 - No database is used by the site or worker.
 - Catalog browse results are cached at Cloudflare edge with a short TTL.
+- The `/books/` page stores cart state in browser `localStorage` under a repo-owned key. This storage is client-side only and is treated as disposable convenience state, not a source of truth.
 - Secrets are stored only in Cloudflare Worker secrets:
   - `SQUARE_ACCESS_TOKEN`
 - Non-secret worker configuration currently includes:
@@ -86,3 +89,4 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 - Items with zero inventory or archived state disappear from the public catalog after cache refresh.
 - `GET /catalog` is cacheable; `POST /checkout` must validate against fresh Square data before creating a checkout link.
 - Browser code must construct DOM nodes from API data and must not inject catalog text with `innerHTML`.
+- Browser-stored cart lines must be reconciled against the latest live catalog payload before rendering or checkout.

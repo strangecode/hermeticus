@@ -46,11 +46,11 @@ This plan includes the next round of quality-of-life improvements for the existi
 - add category filtering derived from the live catalog payload
 - add basic sorting for relevance to browsing: category, title, and price
 - persist the cart in browser storage and restore it on page load
-- improve add-to-cart and checkout feedback, including better stock-conflict recovery
+- improve add-to-cart and checkout feedback, including simple stock-conflict recovery
 - replace the raw card-side quantity workflow with lower-friction purchase controls (99% of products will be one-of-a-kind quantity=1 items, but there should be a way to set a quantity higher than 1 without cluttering the UI)
 - improve catalog card display and empty-result states so the page is easier to scan (mobile-first responsive design)
 - strengthen accessibility for dynamic updates, controls, and result changes
-- clicking the product image should open it full-size in a "lightbox"-style UI (minimal, use Browser-native elements where possible, dismiss via click and ESC keypress)
+- clicking the product image should open it full-size in a minimal lightbox-style UI that prefers native browser APIs (`<dialog>` if available), dismisses via click and `Escape`, and falls back to opening the raw image URL in the browser when the lightbox cannot run
 
 ## Non-goals
 
@@ -72,9 +72,10 @@ This plan includes the next round of quality-of-life improvements for the existi
   Primary implementation surface for:
   - catalog indexing for search/filter/sort
   - cart persistence via `localStorage`
-  - URL or state restoration decisions if adopted
+  - post-checkout URL cleanup for `?checkout=success`
   - improved announcements, error handling, and success handling
   - new add-to-cart controls
+  - image lightbox behavior with a raw-image fallback
 - `_sass/_catalog.scss`
   Primary styling surface for catalog controls, result summaries, empty states, refined card layout, and persisted-cart affordances.
 - `_sass/_components.scss`
@@ -92,7 +93,7 @@ This plan includes the next round of quality-of-life improvements for the existi
 
 Browser and platform dependencies:
 
-- Native browser APIs only: `fetch`, `URLSearchParams`, `Intl.NumberFormat`, `localStorage`.
+- Native browser APIs only: `fetch`, `URLSearchParams`, `Intl.NumberFormat`, `localStorage`, `history.replaceState`, and `<dialog>` when supported.
 - No new package dependency should be added for search, state management, or UI controls.
 
 ## Plan of Work
@@ -117,7 +118,7 @@ Search, filter, and sort should run entirely in the browser against the loaded c
 
 - a text search input
 - a category select populated from catalog data
-- a sort select with title ascending, price low-to-high, and price high-to-low
+- a sort select with category, title ascending, price low-to-high, and price high-to-low
 - a reset action when any browse control is active
 
 The UI should clearly communicate the current result count and when zero books match the current controls.
@@ -126,10 +127,13 @@ The purchase workflow should be simplified around the fact that most book purcha
 
 Checkout feedback should become more specific. Examples:
 
-- when restoring a cart removed sold-out books
 - when checkout fails because availability changed
 - when the user returns from Square with `?checkout=success`
 - when a search or filter reduces the list to zero items
+
+Cart restore should stay simple. On load, the browser may silently discard stored items that no longer exist or no longer have stock. This shop has a small catalog and low order volume, so correctness and maintainability matter more than rare edge-case messaging.
+
+The image interaction should stay minimal. Use a native `<dialog>` as the first choice for the lightbox. Clicking the enlarged image backdrop or pressing `Escape` should dismiss it. If `<dialog>` is unavailable or the chosen image cannot be opened in that UI, the image button should open the raw large image URL in the browser instead of leaving the control inert.
 
 Finally, refine `_sass/_catalog.scss` so the catalog controls, result summaries, cards, and cart read as one coherent browsing interface. This should improve readability and hierarchy, not chase a redesign.
 
@@ -140,24 +144,18 @@ All commands run from `/Users/q/src/hermeticus` unless noted otherwise.
 1. Review the queued plan against current repo state before implementation starts:
 
 ```bash
-sed -n '1,260p' plans/queue/P-002-catalog-qol-improvements.md
+sed -n '1,320p' plans/active/P-002-catalog-qol-improvements.md
 sed -n '1,260p' _includes/square-catalog.html
 sed -n '1,360p' assets/js/main.js
 sed -n '1,260p' _sass/_catalog.scss
 ```
 
-2. When execution begins, move the plan to active:
-
-```bash
-git mv plans/queue/P-002-catalog-qol-improvements.md plans/active/P-002-catalog-qol-improvements.md
-```
-
-3. Update the catalog shell and page content:
+2. Update the catalog shell and page content:
 
 - edit `_includes/square-catalog.html`
 - edit `pages/books.md` if the intro copy or fallback guidance needs to mention the new controls
 
-4. Implement the client-side behavior in `assets/js/main.js`:
+3. Implement the client-side behavior in `assets/js/main.js`:
 
 - add browse controls state
 - derive filtered and sorted results
@@ -165,10 +163,11 @@ git mv plans/queue/P-002-catalog-qol-improvements.md plans/active/P-002-catalog-
 - validate restored cart entries against live stock
 - improve dynamic announcements and error handling
 - simplify add-to-cart controls
+- add the image lightbox with a raw-image fallback
 
-5. Update styles in `_sass/_catalog.scss` and only touch `_sass/_components.scss` if a shared primitive is clearly warranted.
+4. Update styles in `_sass/_catalog.scss` and only touch `_sass/_components.scss` if a shared primitive is clearly warranted.
 
-6. Run targeted validation:
+5. Run targeted validation:
 
 ```bash
 npm test --prefix integrations/square-catalog-worker
@@ -176,7 +175,7 @@ npm test --prefix integrations/square-catalog-worker
 
 Expected result: existing worker tests still pass. If the worker contract remains unchanged, no new worker tests should be necessary.
 
-7. Run the Jekyll build in Docker, which is the intended local path in this repo:
+6. Run the Jekyll build in Docker, which is the intended local path in this repo:
 
 ```bash
 docker compose up --build
@@ -184,7 +183,7 @@ docker compose up --build
 
 Expected result: the site serves locally at `http://127.0.0.1:4000/` and the books page renders with the new controls and behaviors.
 
-8. Manually verify `/books/` in the browser:
+7. Manually verify `/books/` in the browser:
 
 - search for a known word from a title or description
 - filter by category
@@ -193,15 +192,16 @@ Expected result: the site serves locally at `http://127.0.0.1:4000/` and the boo
 - reload the page and confirm the cart persists
 - remove one item and confirm state updates
 - simulate an empty-result state with an unlikely search term
+- open a product image, dismiss it with click, reopen it, and dismiss it with `Escape`
 - test keyboard-only navigation through the controls and cart
 
-9. If implementation changes stable architecture or durable decisions, update:
+8. If implementation changes stable architecture or durable decisions, update:
 
 - `docs/architecture.md`
 - `docs/decisions.md`
 - `plans/progress.md`
 
-10. Commit and push directly to `main` only after the browsing and checkout flow is stable and validated.
+9. Commit and push directly to `main` only after the browsing and checkout flow is stable and validated.
 
 ## Validation and Acceptance
 
@@ -210,14 +210,16 @@ Acceptance is met only when all of the following are true:
 - The books page includes visible browse controls for search, category filtering, and sorting.
 - Search matches text from `n`, `c`, and `d` fields without requiring a network round-trip.
 - Category filter options are derived from the live catalog payload rather than hard-coded.
-- Sorting changes only the presentation order of the currently matched result set.
+- Sorting changes only the presentation order of the currently matched result set and includes category, title, and price options.
 - The page displays a clear result-count summary and a clear empty-results state with a reset path.
 - Adding a book from the grid defaults to one copy with minimal friction.
 - Quantity can still be increased or decreased from the cart without breaking stock validation.
 - Reloading the page restores cart contents from browser storage when those items still exist and still have stock.
-- Restored cart items that are no longer valid are removed safely and explained to the user.
+- Restored cart items that are no longer valid are removed safely, even if that happens silently.
 - Checkout errors leave the cart intact and give a specific, actionable message when possible.
 - Returning from Square checkout shows a clearer success state and does not leave the page in an ambiguous state.
+- Clicking a product image opens a minimal enlarged-image view when supported, and the same control falls back to the raw image URL when that view cannot be used.
+- The enlarged-image view dismisses via backdrop click and `Escape`.
 - The page remains usable with JavaScript disabled: explanatory copy remains visible and the noscript fallback still directs the visitor to contact the shop.
 - Keyboard-only navigation can reach search, filter, sort, add-to-cart, cart controls, and checkout in a sensible order.
 - Screen-reader-relevant updates use appropriate live announcements for catalog load, cart changes, and empty-result or error states.
@@ -229,18 +231,10 @@ Acceptance is met only when all of the following are true:
 - Re-running the JavaScript and Sass edits is safe as long as the plan remains in `plans/active/` and the acceptance criteria remain current.
 - If cart persistence behaves incorrectly, disable only the persistence layer and keep the improved browse controls. Do not block the entire QoL release on `localStorage`.
 - If search and filtering work but sorting introduces confusion, ship search and category filtering first and defer sort in a recorded plan update rather than leaving a half-working control in the UI.
-- If a restored cart cannot be reconciled safely with live stock, clear only the invalid lines and announce what happened. Do not clear the entire cart unless the stored data is malformed.
+- If a restored cart cannot be reconciled safely with live stock, clear only the invalid lines. Do not clear the entire cart unless the stored data is malformed.
 - If new styles degrade the mobile layout, revert only the layout changes in `_sass/_catalog.scss` and keep behavior improvements that remain stable.
+- If the dialog-based lightbox misbehaves in a browser, fall back to opening the raw image URL and keep the catalog browsing flow intact.
 - If any change requires a worker contract update after implementation begins, stop and revise this plan before continuing. Do not silently widen scope into a backend change.
-
-## Deliverables
-
-- An execution-ready queued plan at `plans/queue/P-002-catalog-qol-improvements.md`.
-- Updated catalog UI markup in `_includes/square-catalog.html`.
-- Updated client-side catalog logic in `assets/js/main.js`.
-- Updated catalog-specific styling in `_sass/_catalog.scss`.
-- Any minimal supporting copy change required in `pages/books.md`.
-- Any necessary durable documentation updates if the stable architecture or durable decisions change during execution.
 
 ## Milestones
 
@@ -301,20 +295,23 @@ If the user later wants a different priority order, or extra metadata, record th
 
 ## Progress
 
-- [x] Create execution-ready queued plan.
-- [ ] Reviewed the plan against the current repo state immediately before implementation.
-- [ ] Moved the plan to `plans/active/`.
-- [ ] Implemented browse controls and empty-state handling.
-- [ ] Implemented cart persistence and validation on restore.
-- [ ] Improved feedback, accessibility, and card-level purchase flow.
-- [ ] Ran worker tests and Docker-based local validation.
-- [ ] Updated durable docs if needed.
+- [x] Create execution-ready plan.
+- [x] Reviewed the plan against the current repo state immediately before implementation.
+- [x] Confirmed the plan is already active and revised it to match approved scope.
+- [x] Implemented browse controls and empty-state handling in `_includes/square-catalog.html`, `assets/js/main.js`, and `_sass/_catalog.scss`.
+- [x] Implemented cart persistence and validation on restore in `assets/js/main.js` using `localStorage` with silent removal of invalid lines.
+- [x] Implemented lower-friction add-to-cart, clearer result and cart messaging, and native-dialog image lightbox behavior with anchor fallback.
+- [x] Ran worker tests, `node --check assets/js/main.js`, `git diff --check`, and Docker-based local validation at `http://127.0.0.1:4000/books/`.
+- [x] Updated durable docs in `docs/architecture.md` and `docs/decisions.md` for client-side cart persistence.
 - [ ] Committed and pushed the completed work to `main`.
 
 ## Surprises & Discoveries
 
 - 2026-04-23: `plans/queue/P-002-catalog-qol-improvements.md` already existed as a generic template stub, so the right move was to replace it in place rather than allocate a new plan ID.
 - 2026-04-23: The current worker payload already contains enough fields for search, category filtering, sorting by price/title, so this QoL pass should remain client-side unless implementation uncovers a real data gap.
+- 2026-04-23: Using image anchors as the clickable affordance gives the required raw-image fallback for free when `<dialog>` is unavailable or `showModal()` fails, which is simpler than building a separate fallback path in script.
+- 2026-04-23: The worker payload shape should be normalized once on load before rendering so optional strings and image arrays cannot break the client UI when a Square record is sparse.
+- 2026-04-23: Catalog-specific `display` rules overrode the native `hidden` attribute on the empty state and reset button. Adding `.catalog-app [hidden] { display: none !important; }` restored the intended behavior without restructuring the markup.
 
 ## Decision Log
 
@@ -327,8 +324,12 @@ If the user later wants a different priority order, or extra metadata, record th
 
 ## Outcomes & Retrospective
 
-Queued only. No implementation has begun yet. When execution starts, replace this section with concrete results, gaps, and lessons learned from the work.
+Implementation is nearly complete. The current working approach keeps the entire QoL pass inside the existing books-page include, one browser script, and catalog-specific Sass, with one shared button-state polish in `_sass/_components.scss`. Validation evidence now includes passing worker tests, a clean JavaScript syntax check, a clean `git diff --check`, a rebuilt Docker preview, and manual browser confirmation that add-to-cart, reload persistence, and the dialog image viewer work on `/books/`. Commit and push are the remaining steps.
 
 ## Change Log
 
 - 2026-04-23: Replaced the template stub with a full execution-ready spec for catalog search, filtering, sorting, persistence, feedback, accessibility, and scanning improvements.
+- 2026-04-23: Revised the active plan after review to reflect active status, keep category sorting, define the native-dialog lightbox with raw-image fallback, and simplify cart-recovery expectations for a small low-volume catalog.
+- 2026-04-23: Implemented the first code pass for browse controls, cart persistence, add-to-cart simplification, result messaging, responsive catalog styling, and the minimal image lightbox.
+- 2026-04-23: Fixed the hidden-state regression discovered in browser validation and moved disabled checkout styling into the shared button primitive.
+- 2026-04-23: Updated the stable architecture and ADR docs to capture browser-side cart persistence and live-catalog reconciliation as the durable approach for `/books/`.

@@ -55,3 +55,18 @@ Suggested entry format:
 - summary: Replaced placeholder home-page and about-page copy with language synthesized from visitor reviews, and updated the home hero to sound more like the shop people describe.
 - reason: The site still had placeholder marketing text even after the catalog and layout work was in place.
 - follow-up: Publish this content update with the catalog UI polish so the site reads consistently across the home, books, about, and visit pages.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Reviewed the active catalog QoL plan against the live repo, then revised it in place so it reflects active status, keeps category sorting, defines a native-dialog lightbox with raw-image fallback, and simplifies cart-recovery behavior for the shop’s low-volume workflow.
+- reason: The existing active plan still contained queued-plan language and did not fully describe the approved lightbox and recovery scope.
+- follow-up: Implement the revised browse controls, cart persistence, image viewing, and feedback changes on `/books/`, then validate them in worker tests and the local Jekyll preview.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Reworked `/books/` around explicit search, category, and sort controls; persisted the cart in browser storage; simplified add-to-cart to one-click defaults; and added a minimal dialog-based image viewer that falls back to the raw image link.
+- reason: The existing catalog flow was functional but still felt like a first technical pass, especially around browsing, cart continuity, and image viewing.
+- follow-up: Run worker tests and local preview validation, update durable docs for client-side cart persistence if the behavior remains as implemented, then publish to `main`.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Validated the refreshed `/books/` flow in Docker and a local browser, fixed a hidden-state regression discovered during that pass, and updated the durable docs to treat browser-side cart persistence as part of the stable catalog architecture.
+- reason: The first browser pass exposed one real UI regression and confirmed that cart continuity now changes the stable shape of the books page.
+- follow-up: Commit and push the validated change set to `main`, then wait for the GitHub Pages deploy to publish.
