@@ -6,19 +6,13 @@ services:
     working_dir: /workspace
     ports:
       - "${JEKYLL_PORT:-4000}:4000"
-      - "${JEKYLL_LIVERELOAD_PORT:-35729}:35729"
     volumes:
       - "${COMMON_BASE:-.}:/workspace"
-      - "bundle_cache:/usr/local/bundle"
     environment:
       RES_OPTIONS: "retrans:1 retry:1 timeout:1 attempts:1"
       JEKYLL_ENV: "development"
       JEKYLL_PORT: "4000"
-      JEKYLL_LIVERELOAD_PORT: "35729"
       GEM_HOME: "/usr/local/bundle"
       BUNDLE_PATH: "/usr/local/bundle"
       BUNDLE_BIN: "/usr/local/bundle/bin"
       BUNDLE_APP_CONFIG: "/usr/local/bundle/config"
-
-volumes:
-  bundle_cache:

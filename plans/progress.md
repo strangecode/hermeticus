@@ -35,3 +35,8 @@ Suggested entry format:
 - summary: Added a Docker-based local preview workflow with `Dockerfile`, `docker-compose.yml`, and a dedicated Jekyll startup script so the site can be served without depending on host Ruby setup.
 - reason: Host Ruby compatibility issues made direct local Jekyll preview noisy and brittle even though production deploys were already working.
 - follow-up: Run `docker compose up --build` from the repo root and verify the containerized preview at `http://127.0.0.1:4000/`.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Updated the lockfile to the current GitHub Pages gemset, validated the worker tests, and confirmed `bundle exec jekyll build` succeeds inside Docker without the crashing LiveReload path.
+- reason: The original lockfile pinned an older Jekyll/Liquid stack that was incompatible with modern Ruby and unstable in the first containerized preview attempt.
+- follow-up: Keep the plan active until you decide the work is complete and want it archived.

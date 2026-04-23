@@ -5,6 +5,6 @@ description: Browse books currently available at Hermeticus and check out throug
 permalink: /books/
 ---
 
-This catalog is reserved for our antiquarian collection of rare and first editions, signed copies, fine bindings, and other scarce collectible books. [Visit](/contact/) our store to view the full collection of new and used books.
+This catalog contains highlights from our antiquarian collection of rare and first editions, signed copies, fine bindings, and other scarce collectible books. Visit our store to view the full collection of new and used books.
 
 {% include square-catalog.html %}

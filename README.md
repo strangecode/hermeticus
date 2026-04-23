@@ -25,14 +25,20 @@ If you do not want Ruby and gems installed into your host environment, use the
 repo-local Docker setup instead.
 
 ```sh
-docker compose up --build
+npm run docker:preview
 ```
 
 The Jekyll preview is then available at <http://127.0.0.1:4000/> and
-livereload runs on port `35729`.
+the site rebuilds on file changes.
 
-The compose setup bind-mounts the repo into the container and keeps gems in a
-named Docker volume instead of the host worktree.
+The compose setup bind-mounts the repo source into the container, while Ruby
+and gems are baked into the image instead of your host environment.
+
+If you change `Gemfile` or `Gemfile.lock`, rebuild the image:
+
+```sh
+npm run docker:preview
+```
 
 ## Project layout
 

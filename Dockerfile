@@ -14,6 +14,9 @@ ENV GEM_HOME=/usr/local/bundle \
     BUNDLE_JOBS=4 \
     BUNDLE_RETRY=3
 
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
 COPY scripts/docker-jekyll-serve.sh /usr/local/bin/docker-jekyll-serve
 RUN chmod +x /usr/local/bin/docker-jekyll-serve
 

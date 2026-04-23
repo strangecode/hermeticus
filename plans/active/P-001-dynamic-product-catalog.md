@@ -232,7 +232,7 @@ Acceptance is met only when all of the following are true:
 - [x] Scaffold `integrations/square-catalog-worker/`.
 - [x] Implement worker routes, filtering, caching, and checkout creation.
 - [x] Replace the `/books/` placeholder with the dynamic catalog UI.
-- [ ] Run worker tests and `bundle exec jekyll build`.
+- [x] Run worker tests and `bundle exec jekyll build`.
 - [ ] Deploy the worker and wire the final worker URL into the site.
 - [x] Update `plans/progress.md`, `docs/architecture.md`, `docs/decisions.md`, and `docs/square-catalog.md`.
 - [x] Add Docker-based local preview files and usage notes.
@@ -248,6 +248,8 @@ Acceptance is met only when all of the following are true:
 - 2026-04-22: `bundle exec jekyll build` is currently blocked in this environment because the installed Ruby is `2.6.10`, while the current `github-pages` dependency set now resolves gems that require Ruby `>= 3.0`.
 - 2026-04-22: Running the GitHub Pages Jekyll stack directly on a modern host Ruby surfaced several compatibility issues, so a containerized local preview flow is useful even after the site itself works in production.
 - 2026-04-22: The repo already had `.bundle/config` pointing at `vendor/bundle`, so the Docker setup needs its own `BUNDLE_APP_CONFIG` and bundle volume to avoid rewriting repo-local Bundler settings.
+- 2026-04-22: For this repo’s local preview workflow, it is better to bake gems into the Docker image and rebuild on `Gemfile` or `Gemfile.lock` changes than to run `bundle install` on every container start.
+- 2026-04-22: After updating to the current GitHub Pages gemset, `jekyll serve --livereload` in Docker still crashes in Jekyll’s LiveReload WebSocket layer with `HTTP::Parser::Error`, even though the site build succeeds.
 
 ## Decision Log
 
@@ -263,10 +265,14 @@ Acceptance is met only when all of the following are true:
   Reason: Browsing should be cheap and fast, while checkout should prioritize correctness over cache hits.
 - 2026-04-22: Local preview should run in Docker with the repo bind-mounted into the container.
   Reason: That keeps Ruby and gem churn off the host machine while still giving a reproducible preview environment for Jekyll work.
+- 2026-04-22: The Docker image should contain Ruby gems, while the bind mount should contain only source files from the host repo.
+  Reason: This matches the intended workflow better, avoids repeated startup installs, and keeps dependency ownership inside the container boundary.
+- 2026-04-22: The Docker preview should prefer a stable `jekyll serve` process over built-in LiveReload.
+  Reason: A working local server is more important than automatic refresh, and the current LiveReload path is crashing after the site has already built successfully.
 
 ## Outcomes & Retrospective
 
-- In progress. Worker code, worker tests, page shell, client rendering, deployment docs, and a Docker-based local preview path are implemented locally. Final plan closure still depends on user review and explicit confirmation.
+- In progress. Worker tests pass, `bundle exec jekyll build` succeeds inside the Dockerized Ruby environment, the deployed catalog works on the live site, and the repo now has a stable Docker-based local preview path. Final plan closure still depends on user review and explicit confirmation.
 
 ## Change Log
 
