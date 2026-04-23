@@ -40,3 +40,18 @@ Suggested entry format:
 - summary: Updated the lockfile to the current GitHub Pages gemset, validated the worker tests, and confirmed `bundle exec jekyll build` succeeds inside Docker without the crashing LiveReload path.
 - reason: The original lockfile pinned an older Jekyll/Liquid stack that was incompatible with modern Ruby and unstable in the first containerized preview attempt.
 - follow-up: Keep the plan active until you decide the work is complete and want it archived.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Tightened the catalog UI so the loading callout disappears after a healthy load, the books page can use the full container width, and the cart reads as a separate sticky sidebar instead of another product card.
+- reason: Live review surfaced a stale success-state bug and showed that the shared prose wrapper was squeezing the catalog and making the cart visually blend into the product grid.
+- follow-up: Rebuild the site, verify the `/books/` layout at desktop and mobile widths, then commit and push once the UI looks right.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – reverted
+- summary: Reverted the empty-cart hiding and mobile cart reordering change, restoring the prior sidebar behavior.
+- reason: In practice the cart was not disappearing cleanly and the result was worse than the previous layout.
+- follow-up: If empty-cart hiding is still wanted later, rework it with a layout approach that removes the sidebar from flow instead of just pushing it below the catalog.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Replaced placeholder home-page and about-page copy with language synthesized from visitor reviews, and updated the home hero to sound more like the shop people describe.
+- reason: The site still had placeholder marketing text even after the catalog and layout work was in place.
+- follow-up: Publish this content update with the catalog UI polish so the site reads consistently across the home, books, about, and visit pages.

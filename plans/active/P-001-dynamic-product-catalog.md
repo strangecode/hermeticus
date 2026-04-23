@@ -236,11 +236,12 @@ Acceptance is met only when all of the following are true:
 - [ ] Deploy the worker and wire the final worker URL into the site.
 - [x] Update `plans/progress.md`, `docs/architecture.md`, `docs/decisions.md`, and `docs/square-catalog.md`.
 - [x] Add Docker-based local preview files and usage notes.
-- [ ] Commit and push to `main`.
+- [x] Commit and push to `main`.
 
 ## Surprises & Discoveries
 
 - 2026-04-22: The placeholder catalog page already exists at `pages/books.md`, so v1 should replace that page directly instead of introducing a second product page.
+- 2026-04-22: The shared `page` layout wraps content in `.prose`, which caps the catalog UI at `40rem`; the books page needs a full-width body while keeping its intro copy readable.
 - 2026-04-22: `CNAME` already fixes the production origin as `https://hermeticus.org`, so the production CORS allowlist value is known and should not remain an open question.
 - 2026-04-22: Square `ListCatalog` paginates at 100 objects per page, so the worker must iterate cursors even though current catalog size will likely be much smaller.
 - 2026-04-22: Square Checkout supports hosted checkout for an order with multiple line items, which makes a lightweight cart feasible without exposing payment credentials in the browser.
@@ -272,8 +273,11 @@ Acceptance is met only when all of the following are true:
 
 ## Outcomes & Retrospective
 
-- In progress. Worker tests pass, `bundle exec jekyll build` succeeds inside the Dockerized Ruby environment, the deployed catalog works on the live site, and the repo now has a stable Docker-based local preview path. Final plan closure still depends on user review and explicit confirmation.
+- In progress. Worker tests pass, `bundle exec jekyll build` succeeds inside the Dockerized Ruby environment, the deployed catalog works on the live site, the repo now has a stable Docker-based local preview path, and the home/about content reflects the shop visitors actually describe. Final plan closure still depends on user review and explicit confirmation.
 
 ## Change Log
 
 - 2026-04-22: Activated the plan, removed contradictions, chose the v1 architecture, and rewrote the plan as an execution-ready document.
+- 2026-04-22: Updated the books page and catalog UI follow-up scope to remove the stale loading banner, break the catalog out of the prose column, and restyle the cart as a distinct sidebar.
+- 2026-04-22: Reverted the empty-cart hiding and mobile cart reordering follow-up after it behaved incorrectly in the live layout.
+- 2026-04-22: Replaced placeholder home-page and about-page copy with review-based content, and tightened the home hero copy to better match the shop.

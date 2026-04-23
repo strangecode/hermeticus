@@ -19,8 +19,8 @@ permalink: /contact/
 
 ## Address
 
-469 B Street, Ashland, Oregon 97520
+[469 B Street, Ashland, Oregon 97520](https://maps.app.goo.gl/L2VU5Gq2AK1C586y9)
 
 ## Get in touch
 
-- Email: hello@hermeticus.org
+hello@hermeticus.org

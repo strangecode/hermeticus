@@ -60,12 +60,11 @@
       renderCatalog();
       renderCart();
       layoutNode.hidden = false;
-      showStatus(
-        checkoutComplete
-          ? "Thanks. Square has your order and the shop can now fulfill it."
-          : "Inventory is live. Add books to your cart, then continue to Square checkout.",
-        "success",
-      );
+      if (checkoutComplete) {
+        showStatus("Thanks. Square has your order and the shop can now fulfill it.", "success");
+      } else {
+        hideStatus();
+      }
     } catch (error) {
       layoutNode.hidden = true;
       showStatus("The catalog is temporarily unavailable. Please try again later or contact the shop.", "danger");
@@ -242,7 +241,7 @@
 
     checkoutBusy = true;
     checkoutButton.disabled = true;
-    checkoutButton.textContent = "Preparing Square checkout…";
+    checkoutButton.textContent = "Preparing checkout…";
     showCartMessage("Validating inventory and preparing checkout.");
 
     try {
@@ -270,12 +269,13 @@
     } catch (error) {
       checkoutBusy = false;
       checkoutButton.disabled = false;
-      checkoutButton.textContent = "Checkout with Square";
+      checkoutButton.textContent = "Checkout";
       showCartMessage(error.message || "Checkout could not be created right now.", true);
     }
   }
 
   function showStatus(message, tone) {
+    statusNode.hidden = false;
     statusNode.textContent = message;
     statusNode.className = "catalog-app__status callout";
     if (tone === "danger") {
@@ -285,6 +285,12 @@
     } else if (tone === "success") {
       statusNode.classList.add("callout--success");
     }
+  }
+
+  function hideStatus() {
+    statusNode.hidden = true;
+    statusNode.textContent = "";
+    statusNode.className = "catalog-app__status callout";
   }
 
   function showCartMessage(message, isError) {

@@ -9,7 +9,7 @@ layout: default
     {%- endif -%}
   </header>
 
-  <div class="page__body prose">
+  <div class="page__body{% if page.body_class %} {{ page.body_class }}{% endif %}{% unless page.disable_prose %} prose{% endunless %}">
     {{ content }}
   </div>
 </article>
