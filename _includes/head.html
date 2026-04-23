@@ -8,7 +8,12 @@
   (title + description) and this include stays lean.
 {%- endcomment -%}
 {%- seo -%}
+{%- if site.github.build_revision -%}
+  {%- assign asset_version = site.github.build_revision -%}
+{%- else -%}
+  {%- assign asset_version = site.time | date: '%s' -%}
+{%- endif -%}
 
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-<link rel="icon" href="{{ '/favicon.ico' | relative_url }}" sizes="any">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ asset_version }}">
+<link rel="icon" href="{{ '/favicon.ico' | relative_url }}?v={{ asset_version }}" sizes="any">
 <link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">

@@ -315,6 +315,8 @@ If the user later wants a different priority order, or extra metadata, record th
 - 2026-04-23: Post-release review found three small client regressions: restored carts kept the placeholder empty-cart message, the cart total block needed stronger separation from line items, and result-count copy should stay in the “showing all” form when only sort order changes.
 - 2026-04-23: Clearing the restored-cart placeholder should not depend on exact text matching because the seeded HTML message includes surrounding whitespace from markup formatting. Blank the cart message whenever a populated cart renders and let action-specific calls restore messages afterward.
 - 2026-04-23: A later review found that the empty-result state duplicated itself by announcing “No books match…” both in the lightweight result line and again in the callout. When the empty callout is visible, the compact result line should be blank.
+- 2026-04-23: A deploy review found that changed CSS could stay cached across a normal reload on GitHub Pages. The native repo-friendly fix is to append a GitHub Pages build-specific query string from `site.github.build_revision` to asset URLs in the shared layout includes.
+- 2026-04-23: The current local Jekyll preview already exposes `site.github.build_revision`, so the same shared include logic works both on GitHub Pages and in the repo’s Docker preview without adding a custom config flag.
 
 ## Decision Log
 
@@ -339,3 +341,5 @@ Implementation is nearly complete. The current working approach keeps the entire
 - 2026-04-23: Began a follow-up polish pass for empty-cart message clearing, cart-total wording and separation, and sort-only result-count copy.
 - 2026-04-23: Completed the follow-up polish pass and revalidated the restored-cart message, item/item summary wording, divider styling, and sort-only result-count copy in the local preview.
 - 2026-04-23: Began a second follow-up polish pass to remove the duplicate empty-result announcement from the compact results line.
+- 2026-04-23: Began a deployment follow-up to add GitHub Pages-native asset cache busting for shared CSS and JavaScript URLs.
+- 2026-04-23: Completed the asset-versioning follow-up by appending a shared revision token to CSS, JS, and favicon URLs, then verified the rendered HTML in the local preview.

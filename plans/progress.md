@@ -80,3 +80,13 @@ Suggested entry format:
 - summary: Removed the duplicate empty-result announcement by blanking the compact results line whenever the dedicated empty-state callout is shown.
 - reason: The books page was saying “No books match…” twice for the same no-results state.
 - follow-up: Publish this small follow-up fix to `main` and keep the plan active until you confirm the full catalog polish is done.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Started a deployment-focused follow-up to add GitHub Pages-native cache-busting query strings to shared asset URLs after a normal reload kept serving old CSS.
+- reason: A push to `main` deployed correctly, but the browser reused the prior stylesheet until a forced refresh.
+- follow-up: Update the shared head and layout includes to append a build-specific revision token, validate the rendered asset URLs locally, then publish to `main`.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – partial
+- summary: Added GitHub Pages-native asset versioning by appending a shared revision token to the site CSS, JavaScript, and favicon URLs from the shared layout includes.
+- reason: Normal reloads could keep using stale assets after a deploy even though the new site build was live.
+- follow-up: Publish the include changes to `main`, then verify that a fresh deploy serves changed asset URLs without requiring a forced refresh.
