@@ -26,7 +26,7 @@ Repository facts as of 2026-04-23:
   - `c` category name
   - `m` image URL array
   - `q` available quantity
-- The site must remain usable with JavaScript disabled. For the books page, this currently means explanatory copy plus fallback contact guidance rather than a fully functional storefront.
+- The site must remain usable with JavaScript disabled. For the books page, this currently means explanatory copy plus fallback "contact us" guidance rather than a fully functional storefront.
 - The repo’s design rules still apply: no framework, no new runtime, no speculative backend features, no hard-coded visual values outside the token system, and no abandonment of the static Jekyll plus worker architecture established in `P-001`.
 
 Important current shortcomings this plan addresses:
@@ -44,13 +44,13 @@ This plan includes the next round of quality-of-life improvements for the existi
 
 - add client-side search across book title, category, and description
 - add category filtering derived from the live catalog payload
-- add basic sorting for relevance to browsing: title and price
+- add basic sorting for relevance to browsing: category, title, and price
 - persist the cart in browser storage and restore it on page load
 - improve add-to-cart and checkout feedback, including better stock-conflict recovery
-- replace the raw card-side quantity workflow with lower-friction purchase controls
-- improve catalog card hierarchy and empty-result states so the page is easier to scan
+- replace the raw card-side quantity workflow with lower-friction purchase controls (99% of products will be one-of-a-kind quantity=1 items, but there should be a way to set a quantity higher than 1 without cluttering the UI)
+- improve catalog card display and empty-result states so the page is easier to scan (mobile-first responsive design)
 - strengthen accessibility for dynamic updates, controls, and result changes
-- add a lightweight “contact about this book” path that fits the existing site and static architecture
+- clicking the product image should open it full-size in a "lightbox"-style UI (minimal, use Browser-native elements where possible, dismiss via click and ESC keypress)
 
 ## Non-goals
 
@@ -74,7 +74,7 @@ This plan includes the next round of quality-of-life improvements for the existi
   - cart persistence via `localStorage`
   - URL or state restoration decisions if adopted
   - improved announcements, error handling, and success handling
-  - new add-to-cart controls and contact-link generation
+  - new add-to-cart controls
 - `_sass/_catalog.scss`
   Primary styling surface for catalog controls, result summaries, empty states, refined card layout, and persisted-cart affordances.
 - `_sass/_components.scss`
@@ -155,7 +155,7 @@ git mv plans/queue/P-002-catalog-qol-improvements.md plans/active/P-002-catalog-
 3. Update the catalog shell and page content:
 
 - edit `_includes/square-catalog.html`
-- edit `pages/books.md` if the intro copy or fallback guidance needs to mention the new controls or contact path
+- edit `pages/books.md` if the intro copy or fallback guidance needs to mention the new controls
 
 4. Implement the client-side behavior in `assets/js/main.js`:
 
@@ -282,7 +282,7 @@ Result:
 
 - clearer success and error messaging
 - lower-friction add flow
-- better card hierarchy and contact path
+- better card hierarchy
 - stronger live announcements and empty states
 
 Proof:
@@ -295,10 +295,9 @@ No blocking questions are required to start implementation. The plan assumes:
 
 - search runs over title, category, and description only
 - sorting options are limited to title and price
-- the contact path uses the existing contact page or a mailto-style link rather than a new form
 - the worker payload remains unchanged unless implementation proves otherwise
 
-If the user later wants a different priority order, a different contact affordance, or extra metadata, record that change in this section and update the plan before execution.
+If the user later wants a different priority order, or extra metadata, record that change in this section and update the plan before execution.
 
 ## Progress
 
@@ -315,7 +314,7 @@ If the user later wants a different priority order, a different contact affordan
 ## Surprises & Discoveries
 
 - 2026-04-23: `plans/queue/P-002-catalog-qol-improvements.md` already existed as a generic template stub, so the right move was to replace it in place rather than allocate a new plan ID.
-- 2026-04-23: The current worker payload already contains enough fields for search, category filtering, sorting by price/title, and contact-link labeling, so this QoL pass should remain client-side unless implementation uncovers a real data gap.
+- 2026-04-23: The current worker payload already contains enough fields for search, category filtering, sorting by price/title, so this QoL pass should remain client-side unless implementation uncovers a real data gap.
 
 ## Decision Log
 
