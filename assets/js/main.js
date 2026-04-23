@@ -1,6 +1,6 @@
 /*
  * Progressive enhancement only. The site must remain fully usable with
- * JavaScript disabled. Add behaviours here sparingly, and always behind a
+ * JavaScript disabled. Add behaviors here sparingly, and always behind a
  * feature check so a missing element does not throw.
  */
 (function () {

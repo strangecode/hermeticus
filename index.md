@@ -1,7 +1,7 @@
 ---
 layout: home
 title: Hermeticus Bookshop
-description: An independent bookshop. Browse the catalogue, find upcoming events, and learn how to visit us.
+description: An independent bookshop. Browse the catalog, find upcoming events, and learn how to visit us.
 permalink: /
 ---
 
@@ -18,7 +18,7 @@ permalink: /
   <h2 class="section__title">What you&rsquo;ll find</h2>
   <div class="grid">
     <article class="card">
-      <h3 class="card__title">A curated catalogue</h3>
+      <h3 class="card__title">A curated catalog</h3>
       <p>Used classics, rare esoteric titles, philosophy, art, children&rsquo;s books, and deep reads that reward a slow browse.</p>
     </article>
     <article class="card">
