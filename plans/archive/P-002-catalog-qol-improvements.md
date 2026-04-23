@@ -303,7 +303,8 @@ If the user later wants a different priority order, or extra metadata, record th
 - [x] Implemented lower-friction add-to-cart, clearer result and cart messaging, and native-dialog image lightbox behavior with anchor fallback.
 - [x] Ran worker tests, `node --check assets/js/main.js`, `git diff --check`, and Docker-based local validation at `http://127.0.0.1:4000/books/`.
 - [x] Updated durable docs in `docs/architecture.md` and `docs/decisions.md` for client-side cart persistence.
-- [ ] Committed and pushed the completed work to `main`.
+- [x] Committed and pushed the completed work to `main`.
+- [x] User reviewed the completed work and confirmed the plan can be archived.
 
 ## Surprises & Discoveries
 
@@ -329,7 +330,7 @@ If the user later wants a different priority order, or extra metadata, record th
 
 ## Outcomes & Retrospective
 
-Implementation is nearly complete. The current working approach keeps the entire QoL pass inside the existing books-page include, one browser script, and catalog-specific Sass, with one shared button-state polish in `_sass/_components.scss`. Validation evidence now includes passing worker tests, a clean JavaScript syntax check, a clean `git diff --check`, a rebuilt Docker preview, and manual browser confirmation that add-to-cart, reload persistence, and the dialog image viewer work on `/books/`. Commit and push are the remaining steps.
+Completed and archived after user review. The implemented QoL pass keeps the catalog improvements inside the existing books-page include, one browser script, and catalog-specific Sass, with one shared button-state polish in `_sass/_components.scss` and GitHub Pages-native cache busting in the shared layout includes. Validation evidence included passing worker tests, clean JavaScript syntax checks, clean `git diff --check` runs, Docker preview validation, browser smoke checks for cart persistence, lightbox behavior, empty states, and rendered revisioned asset URLs. Follow-up polish addressed restored-cart messaging, item/items summary wording, duplicate empty-result copy, and stale asset caching after deploy.
 
 ## Change Log
 
@@ -343,3 +344,4 @@ Implementation is nearly complete. The current working approach keeps the entire
 - 2026-04-23: Began a second follow-up polish pass to remove the duplicate empty-result announcement from the compact results line.
 - 2026-04-23: Began a deployment follow-up to add GitHub Pages-native asset cache busting for shared CSS and JavaScript URLs.
 - 2026-04-23: Completed the asset-versioning follow-up by appending a shared revision token to CSS, JS, and favicon URLs, then verified the rendered HTML in the local preview.
+- 2026-04-23: User confirmed the plan is complete; moved `plans/active/P-002-catalog-qol-improvements.md` to `plans/archive/P-002-catalog-qol-improvements.md`.

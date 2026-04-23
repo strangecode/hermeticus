@@ -90,3 +90,8 @@ Suggested entry format:
 - summary: Added GitHub Pages-native asset versioning by appending a shared revision token to the site CSS, JavaScript, and favicon URLs from the shared layout includes.
 - reason: Normal reloads could keep using stale assets after a deploy even though the new site build was live.
 - follow-up: Publish the include changes to `main`, then verify that a fresh deploy serves changed asset URLs without requiring a forced refresh.
+
+## 2026-04-23 – P-002 – catalog-qol-improvements – completed
+- summary: Archived `P-002` after user review confirmed the catalog QoL work is complete.
+- reason: The browsing controls, cart persistence, image lightbox, post-review polish, and asset cache-busting fixes were implemented, validated, committed, and pushed.
+- follow-up: No immediate P-002 work remains. Future catalog changes should start from a new plan or a targeted follow-up request.
