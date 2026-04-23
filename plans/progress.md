@@ -30,3 +30,8 @@ Suggested entry format:
 - summary: Implemented the worker, the `/books/` catalog UI, the cart flow, and the deployment runbook. Worker tests pass locally.
 - reason: The selected v1 architecture was stable enough to build after the plan rewrite.
 - follow-up: Deploy the worker with real Square and Cloudflare credentials, set `_config.yml` `square_catalog_api_base`, and rerun end-to-end validation in an environment with Ruby >= 3.0 for local Jekyll builds.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Added a Docker-based local preview workflow with `Dockerfile`, `docker-compose.yml`, and a dedicated Jekyll startup script so the site can be served without depending on host Ruby setup.
+- reason: Host Ruby compatibility issues made direct local Jekyll preview noisy and brittle even though production deploys were already working.
+- follow-up: Run `docker compose up --build` from the repo root and verify the containerized preview at `http://127.0.0.1:4000/`.

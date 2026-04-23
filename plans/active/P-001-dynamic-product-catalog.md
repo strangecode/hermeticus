@@ -45,6 +45,7 @@ V1 publishing rule:
 - Extend `assets/js/main.js` to render the catalog, manage a lightweight cart, and redirect buyers to Square checkout.
 - Add catalog and cart styling in the existing Sass structure.
 - Add operator documentation for configuration, deployment, and rollback.
+- Add a Docker-based local preview workflow so the site can be served without relying on host Ruby setup.
 - Update durable docs for the new architecture and decisions.
 
 ## Non-goals
@@ -193,6 +194,7 @@ curl -X POST '<worker-url>/checkout' \
 ```
 
 9. Set the site-side worker URL in the page or include configuration and push the Jekyll changes to `main`.
+10. Add `Dockerfile` and `docker-compose.yml` for local Jekyll preview with the project mounted into the container and host-accessible ports.
 
 ## Validation and Acceptance
 
@@ -233,6 +235,7 @@ Acceptance is met only when all of the following are true:
 - [ ] Run worker tests and `bundle exec jekyll build`.
 - [ ] Deploy the worker and wire the final worker URL into the site.
 - [x] Update `plans/progress.md`, `docs/architecture.md`, `docs/decisions.md`, and `docs/square-catalog.md`.
+- [x] Add Docker-based local preview files and usage notes.
 - [ ] Commit and push to `main`.
 
 ## Surprises & Discoveries
@@ -243,6 +246,8 @@ Acceptance is met only when all of the following are true:
 - 2026-04-22: Square Checkout supports hosted checkout for an order with multiple line items, which makes a lightweight cart feasible without exposing payment credentials in the browser.
 - 2026-04-22: `npm install` initially failed because the default npm cache contains root-owned files on this machine. Using a temp cache directory worked without changing global state.
 - 2026-04-22: `bundle exec jekyll build` is currently blocked in this environment because the installed Ruby is `2.6.10`, while the current `github-pages` dependency set now resolves gems that require Ruby `>= 3.0`.
+- 2026-04-22: Running the GitHub Pages Jekyll stack directly on a modern host Ruby surfaced several compatibility issues, so a containerized local preview flow is useful even after the site itself works in production.
+- 2026-04-22: The repo already had `.bundle/config` pointing at `vendor/bundle`, so the Docker setup needs its own `BUNDLE_APP_CONFIG` and bundle volume to avoid rewriting repo-local Bundler settings.
 
 ## Decision Log
 
@@ -256,10 +261,12 @@ Acceptance is met only when all of the following are true:
   Reason: The catalog is read often and changes infrequently; compact responses reduce bandwidth without hiding meaning in the codebase.
 - 2026-04-22: `GET /catalog` is cached, but `POST /checkout` validates against fresh Square data.
   Reason: Browsing should be cheap and fast, while checkout should prioritize correctness over cache hits.
+- 2026-04-22: Local preview should run in Docker with the repo bind-mounted into the container.
+  Reason: That keeps Ruby and gem churn off the host machine while still giving a reproducible preview environment for Jekyll work.
 
 ## Outcomes & Retrospective
 
-- In progress. Worker code, worker tests, page shell, client rendering, cart logic, and deployment docs are implemented locally. Full Jekyll build validation is still blocked by the local Ruby toolchain version, and worker deployment still needs real Square and Cloudflare credentials.
+- In progress. Worker code, worker tests, page shell, client rendering, deployment docs, and a Docker-based local preview path are implemented locally. Final plan closure still depends on user review and explicit confirmation.
 
 ## Change Log
 

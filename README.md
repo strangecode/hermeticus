@@ -19,6 +19,21 @@ bundle exec jekyll serve --livereload
 
 The site is then available at <http://127.0.0.1:4000/>.
 
+## Local preview with Docker
+
+If you do not want Ruby and gems installed into your host environment, use the
+repo-local Docker setup instead.
+
+```sh
+docker compose up --build
+```
+
+The Jekyll preview is then available at <http://127.0.0.1:4000/> and
+livereload runs on port `35729`.
+
+The compose setup bind-mounts the repo into the container and keeps gems in a
+named Docker volume instead of the host worktree.
+
 ## Project layout
 
 ```

@@ -5,7 +5,6 @@ description: Browse books currently available at Hermeticus and check out throug
 permalink: /books/
 ---
 
-Hermeticus keeps this page tied to the live Square catalog. If a book sells in
-the shop or is removed from inventory, it disappears here after the next sync.
+This catalog is reserved for our antiquarian collection of rare and first editions, signed copies, fine bindings, and other scarce collectible books. [Visit](/contact/) our store to view the full collection of new and used books.
 
 {% include square-catalog.html %}

@@ -3,15 +3,6 @@
   data-catalog-root
   data-api-base="{{ site.square_catalog_api_base | escape }}"
 >
-  <div class="catalog-app__intro">
-    <p class="catalog-app__eyebrow">Live from the shop floor</p>
-    <h2 class="catalog-app__title">Books currently available</h2>
-    <p class="catalog-app__lede">
-      Each listing is synced from Square inventory. Add one or more books to
-      your cart, then finish payment on Square&rsquo;s hosted checkout page.
-    </p>
-  </div>
-
   <div class="catalog-app__status callout" data-catalog-status>
     Loading the current catalog…
   </div>
@@ -29,16 +20,14 @@
       </p>
       <ul class="catalog-cart__items" data-cart-items></ul>
       <p class="catalog-cart__summary" data-cart-summary></p>
-      <button class="button catalog-cart__checkout" type="button" data-cart-checkout disabled>
-        Checkout with Square
-      </button>
+      <button class="button catalog-cart__checkout" type="button" data-cart-checkout disabled>Checkout</button>
     </aside>
   </div>
 
   <noscript>
     <div class="callout">
       Online checkout needs JavaScript. To ask about a specific book or place an
-      order directly, use the contact details on the <a href="{{ '/contact/' | relative_url }}">contact page</a>.
+      order directly, <a href="{{ '/contact/' | relative_url }}">contact us</a>.
     </div>
   </noscript>
 </section>
