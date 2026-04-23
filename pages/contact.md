@@ -5,7 +5,6 @@ description: Opening hours, address, and how to get in touch with Hermeticus Boo
 permalink: /contact/
 ---
 
-
 ## Opening hours
 
 | Day       | Hours        |
@@ -24,5 +23,4 @@ permalink: /contact/
 
 ## Get in touch
 
-- Email: _placeholder@example.com_
-- Phone: (530) 693-5774
+- Email: hello@hermeticus.org
