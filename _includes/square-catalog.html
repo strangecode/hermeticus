@@ -1,0 +1,44 @@
+<section
+  class="catalog-app"
+  data-catalog-root
+  data-api-base="{{ site.square_catalog_api_base | escape }}"
+>
+  <div class="catalog-app__intro">
+    <p class="catalog-app__eyebrow">Live from the shop floor</p>
+    <h2 class="catalog-app__title">Books currently available</h2>
+    <p class="catalog-app__lede">
+      Each listing is synced from Square inventory. Add one or more books to
+      your cart, then finish payment on Square&rsquo;s hosted checkout page.
+    </p>
+  </div>
+
+  <div class="catalog-app__status callout" data-catalog-status>
+    Loading the current catalog…
+  </div>
+
+  <div class="catalog-app__layout" data-catalog-layout hidden>
+    <div class="catalog-grid" data-catalog-grid aria-live="polite"></div>
+
+    <aside class="catalog-cart" data-catalog-cart aria-labelledby="catalog-cart-title">
+      <div class="catalog-cart__header">
+        <p class="catalog-cart__eyebrow">Your selections</p>
+        <h3 id="catalog-cart-title" class="catalog-cart__title">Cart</h3>
+      </div>
+      <p class="catalog-cart__message" data-cart-message>
+        Add a book to begin checkout.
+      </p>
+      <ul class="catalog-cart__items" data-cart-items></ul>
+      <p class="catalog-cart__summary" data-cart-summary></p>
+      <button class="button catalog-cart__checkout" type="button" data-cart-checkout disabled>
+        Checkout with Square
+      </button>
+    </aside>
+  </div>
+
+  <noscript>
+    <div class="callout">
+      Online checkout needs JavaScript. To ask about a specific book or place an
+      order directly, use the contact details on the <a href="{{ '/contact/' | relative_url }}">contact page</a>.
+    </div>
+  </noscript>
+</section>

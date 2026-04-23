@@ -1,0 +1,196 @@
+/* =========================================================================
+   Catalog — live Square catalog and cart
+   =======================================================================*/
+
+.catalog-app {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.catalog-app__intro {
+  max-width: 48rem;
+}
+
+.catalog-app__eyebrow,
+.catalog-cart__eyebrow {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: var(--step--1);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.catalog-app__title,
+.catalog-cart__title {
+  margin-bottom: var(--space-3);
+}
+
+.catalog-app__lede {
+  max-width: var(--prose-max);
+  color: var(--color-text-muted);
+}
+
+.catalog-app__status {
+  margin: 0;
+}
+
+.catalog-app__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 0.9fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-5);
+}
+
+.catalog-card,
+.catalog-cart {
+  background-color: var(--color-bg);
+  border: var(--border-thin);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.catalog-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.catalog-card__category,
+.catalog-card__stock,
+.catalog-cart__item-detail,
+.catalog-cart__message {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.catalog-card__category {
+  font-family: var(--font-heading);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.catalog-card__title,
+.catalog-card__price,
+.catalog-card__description {
+  margin: 0;
+}
+
+.catalog-card__price {
+  font-family: var(--font-heading);
+  font-size: var(--step-1);
+  font-weight: var(--weight-bold);
+}
+
+.catalog-card__gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 70%;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scroll-snap-type: x proximity;
+}
+
+.catalog-card__image {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: var(--border-thin);
+  scroll-snap-align: start;
+  background-color: var(--color-surface);
+}
+
+.catalog-card__actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: minmax(5rem, 6rem) 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.catalog-card__quantity {
+  width: 100%;
+}
+
+.catalog-cart {
+  position: sticky;
+  top: calc(3.5rem + var(--space-6));
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.catalog-cart__header,
+.catalog-cart__summary {
+  margin: 0;
+}
+
+.catalog-cart__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.catalog-cart__item {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-thin);
+}
+
+.catalog-cart__item-title,
+.catalog-cart__item-count {
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+.catalog-cart__item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.catalog-cart__item-controls .button {
+  min-height: 2.75rem;
+  padding-inline: var(--space-4);
+}
+
+.catalog-cart__item-count {
+  min-width: 2ch;
+  text-align: center;
+}
+
+.catalog-cart__checkout {
+  width: 100%;
+}
+
+.catalog-cart__message--error {
+  color: var(--color-danger);
+}
+
+@media (max-width: 54rem) {
+  .catalog-app__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-cart {
+    position: static;
+  }
+}

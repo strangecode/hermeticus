@@ -15,6 +15,7 @@ lang: en
 # is a one-line change.
 url: "https://hermeticus.org"
 baseurl: ""
+square_catalog_api_base: ""
 
 # Build configuration
 markdown: kramdown

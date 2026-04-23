@@ -1,23 +1,11 @@
 ---
 layout: page
 title: Books
-description: Browse the Hermeticus catalogue by section and theme.
+description: Browse books currently available at Hermeticus and check out through Square.
 permalink: /books/
 ---
 
-Placeholder page for the catalogue. When content arrives, consider organising
-it by section (poetry, fiction, non-fiction, children's) with a short
-introduction per section.
+Hermeticus keeps this page tied to the live Square catalog. If a book sells in
+the shop or is removed from inventory, it disappears here after the next sync.
 
-## Sections
-
-- Poetry
-- Fiction
-- Non-fiction
-- Children&rsquo;s
-
-## How to extend
-
-Each section can become its own Markdown page under `pages/books/` with
-`permalink: /books/<slug>/`, and a card grid here can link to them. Keep
-navigation entries in `_data/navigation.yml`.
+{% include square-catalog.html %}

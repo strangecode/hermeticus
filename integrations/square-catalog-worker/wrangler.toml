@@ -1,0 +1,9 @@
+name = "hermeticus-square-catalog"
+main = "src/index.js"
+compatibility_date = "2026-04-22"
+
+[vars]
+ALLOWED_ORIGINS = "https://hermeticus.org,http://127.0.0.1:4000"
+SQUARE_ENV = "production"
+CATALOG_TTL_SECONDS = "300"
+SQUARE_VERSION = "2026-01-22"

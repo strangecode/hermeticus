@@ -20,3 +20,13 @@ Suggested entry format:
 ```
 
 ---
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Activated `P-001` and rewrote it into an execution-ready v1 centered on a repo-owned Cloudflare Worker, cached public catalog JSON, and Square-hosted multi-item checkout.
+- reason: The queued draft had unresolved product decisions, off-repo paths, and contradictory CORS and API assumptions that would have made implementation unreliable.
+- follow-up: Build the worker and replace the `/books/` placeholder with the live catalog UI.
+
+## 2026-04-22 – P-001 – dynamic-square-catalog – partial
+- summary: Implemented the worker, the `/books/` catalog UI, the cart flow, and the deployment runbook. Worker tests pass locally.
+- reason: The selected v1 architecture was stable enough to build after the plan rewrite.
+- follow-up: Deploy the worker with real Square and Cloudflare credentials, set `_config.yml` `square_catalog_api_base`, and rerun end-to-end validation in an environment with Ruby >= 3.0 for local Jekyll builds.
