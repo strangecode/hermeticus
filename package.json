@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "docker:preview": "docker compose up --build"
+    "docker:up": "docker compose up --build"
   },
   "dependencies": {
     "wrangler": "4.81.0"

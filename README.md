@@ -25,7 +25,7 @@ If you do not want Ruby and gems installed into your host environment, use the
 repo-local Docker setup instead.
 
 ```sh
-npm run docker:preview
+npm run docker:up
 ```
 
 The Jekyll preview is then available at <http://127.0.0.1:4000/> and
@@ -37,7 +37,7 @@ and gems are baked into the image instead of your host environment.
 If you change `Gemfile` or `Gemfile.lock`, rebuild the image:
 
 ```sh
-npm run docker:preview
+npm run docker:up
 ```
 
 ## Project layout
