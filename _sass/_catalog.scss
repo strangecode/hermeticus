@@ -193,7 +193,7 @@
 .catalog-card__image {
   aspect-ratio: 4 / 5;
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: var(--radius-md);
   border: var(--border-thin);
   background-color: var(--color-surface);
@@ -352,6 +352,10 @@
 }
 
 @media (max-width: 40rem) {
+  .catalog-card__image {
+    object-fit: cover;
+  }
+
   .catalog-lightbox {
     max-width: 100vw;
     width: 100vw;
