@@ -35,6 +35,89 @@ test("serializeCatalog drops zero-stock items and sorts by category then name", 
   ]);
 });
 
+test("safeHandleRequest returns Square description HTML in the description field", async () => {
+  const requests = [];
+  const fetchImpl = async (url) => {
+    requests.push(url);
+    if (url.includes("/v2/catalog/list")) {
+      return new Response(JSON.stringify({
+        objects: [
+          {
+            id: "category-1",
+            type: "CATEGORY",
+            category_data: { name: "Postcards" },
+          },
+          {
+            id: "item-1",
+            type: "ITEM",
+            item_data: {
+              name: "Watercolor Postcard",
+              category_id: "category-1",
+              description_html:
+                '<p>Painting by <a rel="noopener noreferrer nofollow" href="https://ayon.me/">Alma Ayon.</a></p>',
+              description_plaintext: "Painting by Alma Ayon.",
+              variations: [
+                {
+                  id: "variation-1",
+                  item_variation_data: {
+                    price_money: { amount: 500 },
+                    sellable: true,
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      }));
+    }
+
+    if (url.includes("/v2/inventory/counts/batch-retrieve")) {
+      return new Response(JSON.stringify({
+        counts: [
+          {
+            catalog_object_id: "variation-1",
+            quantity: "3",
+          },
+        ],
+      }));
+    }
+
+    assert.fail(`Unexpected Square request: ${url}`);
+  };
+
+  const request = new Request("https://worker.example/catalog", {
+    headers: {
+      Origin: "https://hermeticus.org",
+    },
+  });
+
+  const response = await safeHandleRequest(
+    request,
+    {
+      ALLOWED_ORIGINS: "https://hermeticus.org",
+      SQUARE_ACCESS_TOKEN: "token",
+      SQUARE_LOCATION_ID: "location",
+    },
+    { waitUntil() {} },
+    { fetchImpl },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(requests.length, 2);
+  assert.deepEqual(await response.json(), [
+    {
+      i: "item-1",
+      v: "variation-1",
+      n: "Watercolor Postcard",
+      p: 500,
+      d: '<p>Painting by <a rel="noopener noreferrer nofollow" href="https://ayon.me/">Alma Ayon.</a></p>',
+      c: "Postcards",
+      m: [],
+      q: 3,
+    },
+  ]);
+});
+
 test("parseCheckoutBody rejects duplicate variation ids", async () => {
   const request = new Request("https://worker.example/checkout", {
     method: "POST",

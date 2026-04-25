@@ -157,6 +157,20 @@
   font-weight: var(--weight-bold);
 }
 
+.catalog-card__description {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.catalog-card__description :where(p, ul, ol) {
+  margin: 0;
+}
+
+.catalog-card__description :where(ul, ol) {
+  padding-left: var(--space-5);
+}
+
 .catalog-card__gallery {
   display: grid;
   grid-auto-flow: column;

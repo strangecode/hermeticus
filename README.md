@@ -59,3 +59,11 @@ AGENTS.md         Contributor guide (read this first)
 
 This repository is configured so GitHub Pages builds Jekyll automatically
 from the default branch &mdash; no CI/CD pipeline is required.
+
+The Square catalog Worker is deployed separately through Wrangler:
+
+```sh
+npm --prefix integrations/square-catalog-worker run deploy
+```
+
+Non-interactive deploys require `CLOUDFLARE_API_TOKEN` in the environment.

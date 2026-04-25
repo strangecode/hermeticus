@@ -215,8 +215,10 @@ function extractCatalogCandidate(object, categories, images) {
     "";
   const categoryName = categories.get(categoryId)?.name || "";
   const description =
+    item.description_html ||
     item.description_plaintext ||
-    stripHtml(item.description_html || item.description || "");
+    item.description ||
+    "";
   const imageIds = uniqueValues([
     ...(item.image_ids || []),
     ...(variationData.image_ids || []),
@@ -385,13 +387,6 @@ async function squareJson(url, init, env, fetchImpl) {
   }
 
   return payload;
-}
-
-function stripHtml(value) {
-  return String(value || "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 function normalizeQuantity(value) {

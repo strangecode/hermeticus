@@ -42,7 +42,7 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
    - retrieves inventory counts for candidate variation IDs at `SQUARE_LOCATION_ID`
    - returns a compact JSON array with short keys
    - caches that response at Cloudflare
-6. The browser renders cards with category, image links, description, price, stock count, browse controls, and add-to-cart controls.
+6. The browser renders cards with category, image links, Square description content, price, stock count, browse controls, and add-to-cart controls.
 7. Client-side search, category filtering, and sorting run entirely against the already loaded catalog array without further network requests.
 8. The browser persists cart lines in `localStorage`, reconciles them against the freshly loaded catalog on page load, and silently drops lines that are no longer valid.
 9. When the buyer checks out, `assets/js/main.js` sends `POST <worker>/checkout` with variation IDs and requested quantities.
@@ -55,7 +55,8 @@ The public catalog payload uses these keys:
 - `v` variation ID
 - `n` name
 - `p` price in minor units
-- `d` description
+- `d` description. This contains Square `description_html` when available,
+  otherwise Square plaintext description data.
 - `c` category name
 - `m` image URL list
 - `q` quantity available
@@ -88,5 +89,6 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 - Only items with exactly one sellable variation and positive tracked inventory at the configured Square location are published on `/books/`.
 - Items with zero inventory or archived state disappear from the public catalog after cache refresh.
 - `GET /catalog` is cacheable; `POST /checkout` must validate against fresh Square data before creating a checkout link.
-- Browser code must construct DOM nodes from API data and must not inject catalog text with `innerHTML`.
+- Browser code must sanitize Square description HTML before rendering it. Other
+  catalog fields are rendered as text.
 - Browser-stored cart lines must be reconciled against the latest live catalog payload before rendering or checkout.

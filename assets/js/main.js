@@ -13,8 +13,19 @@
 
   const STORAGE_KEY = "hermeticus.catalog.cart.v1";
   const DEFAULT_SORT = "category";
-  const EMPTY_CART_MESSAGE = "Add a book to begin checkout.";
-  const SUCCESS_MESSAGE = "Thanks. Square has your order and the shop can now fulfill it.";
+  const ALLOWED_DESCRIPTION_TAGS = new Set([
+    "a",
+    "br",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "p",
+    "strong",
+    "ul",
+  ]);
+  const EMPTY_CART_MESSAGE = "Add an item to begin checkout.";
+  const SUCCESS_MESSAGE = "Thanks. We've received your order and can now fulfill it.";
   const apiBase = (root.getAttribute("data-api-base") || "").trim().replace(/\/$/, "");
   const statusNode = root.querySelector("[data-catalog-status]");
   const layoutNode = root.querySelector("[data-catalog-layout]");
@@ -41,13 +52,9 @@
     cart: new Map(),
     catalog: [],
     checkoutBusy: false,
-    checkoutComplete: new URLSearchParams(window.location.search).get("checkout") === "success",
+    checkoutComplete:
+      new URLSearchParams(window.location.search).get("checkout") === "success",
   };
-
-  if (!apiBase) {
-    showStatus("The online catalog is being configured. Please check back shortly.", "warning");
-    return;
-  }
 
   bindEvents();
   if (state.checkoutComplete) {
@@ -112,7 +119,10 @@
       state.catalog = payload.filter(isCatalogItem).map(normalizeCatalogItem);
       if (state.catalog.length === 0) {
         layoutNode.hidden = true;
-        showStatus("No books are currently available online. Please check back soon.", "warning");
+        showStatus(
+          "No books are currently available for sale online. Please check back soon.",
+          "warning",
+        );
         return;
       }
 
@@ -138,11 +148,11 @@
 
   function populateCategoryOptions() {
     const fragment = document.createDocumentFragment();
-    const categories = [...new Set(state.catalog.map((item) => item.c).filter(Boolean))].sort(
-      function (left, right) {
-        return left.localeCompare(right);
-      },
-    );
+    const categories = [
+      ...new Set(state.catalog.map((item) => item.c).filter(Boolean)),
+    ].sort(function (left, right) {
+      return left.localeCompare(right);
+    });
 
     categorySelect.replaceChildren(
       createElement("option", {
@@ -192,7 +202,9 @@
           return true;
         }
 
-        const haystack = normalizeText([item.n, item.c, item.d].filter(Boolean).join(" "));
+        const haystack = normalizeText(
+          [item.n, item.c, getSearchableDescription(item.d)].filter(Boolean).join(" "),
+        );
         return haystack.includes(normalizedSearch);
       })
       .sort(compareCatalogItems);
@@ -221,7 +233,9 @@
 
   function buildResultsSummary(visibleCount) {
     if (visibleCount === state.catalog.length && !hasActiveNarrowingControls()) {
-      return visibleCount === 1 ? "Showing 1 book." : "Showing all " + visibleCount + " books.";
+      return visibleCount === 1
+        ? "Showing 1 item."
+        : "Showing all " + visibleCount + " items.";
     }
 
     if (visibleCount === 0) {
@@ -233,7 +247,7 @@
       visibleCount +
       " of " +
       state.catalog.length +
-      (state.catalog.length === 1 ? " book." : " books.")
+      (state.catalog.length === 1 ? " item." : " items.")
     );
   }
 
@@ -270,12 +284,7 @@
     );
 
     if (item.d) {
-      card.appendChild(
-        createElement("p", {
-          className: "catalog-card__description",
-          text: item.d,
-        }),
-      );
+      card.appendChild(buildDescriptionNode(item.d));
     }
 
     card.appendChild(
@@ -310,7 +319,8 @@
         attrs: {
           href: imageUrl,
           "aria-label":
-            item.n + (item.m.length > 1 ? ", image " + (index + 1) + " of " + item.m.length : ""),
+            item.n +
+            (item.m.length > 1 ? ", image " + (index + 1) + " of " + item.m.length : ""),
         },
       });
 
@@ -391,7 +401,10 @@
     cartSummaryNode.textContent =
       totalCount === 0
         ? ""
-        : totalCount + (totalCount === 1 ? " item" : " items") + " • " + formatPrice(totalPrice);
+        : totalCount +
+          (totalCount === 1 ? " item" : " items") +
+          " • " +
+          formatPrice(totalPrice);
 
     if (totalCount === 0) {
       showCartMessage(EMPTY_CART_MESSAGE);
@@ -420,9 +433,13 @@
     );
 
     controls.appendChild(
-      stepperButton("−", function () {
-        updateCart(item, quantity - 1);
-      }, "Reduce quantity for " + item.n),
+      stepperButton(
+        "−",
+        function () {
+          updateCart(item, quantity - 1);
+        },
+        "Reduce quantity for " + item.n,
+      ),
     );
     controls.appendChild(
       createElement("span", {
@@ -431,9 +448,13 @@
       }),
     );
     controls.appendChild(
-      stepperButton("+", function () {
-        updateCart(item, quantity + 1);
-      }, "Increase quantity for " + item.n),
+      stepperButton(
+        "+",
+        function () {
+          updateCart(item, quantity + 1);
+        },
+        "Increase quantity for " + item.n,
+      ),
     );
     controls.appendChild(
       stepperButton(
@@ -676,7 +697,79 @@
   }
 
   function normalizeText(value) {
-    return String(value || "").trim().toLocaleLowerCase();
+    return String(value || "")
+      .trim()
+      .toLocaleLowerCase();
+  }
+
+  function getSearchableDescription(value) {
+    const template = document.createElement("template");
+    template.innerHTML = String(value || "");
+    return template.content.textContent || "";
+  }
+
+  function buildDescriptionNode(description) {
+    const node = createElement("div", {
+      className: "catalog-card__description",
+    });
+    const fragment = sanitizeDescriptionHtml(description);
+    if (fragment.hasChildNodes()) {
+      node.appendChild(fragment);
+    } else {
+      node.textContent = String(description || "");
+    }
+    return node;
+  }
+
+  function sanitizeDescriptionHtml(value) {
+    const template = document.createElement("template");
+    template.innerHTML = String(value || "");
+    return sanitizeDescriptionChildren(template.content);
+  }
+
+  function sanitizeDescriptionChildren(parent) {
+    const fragment = document.createDocumentFragment();
+    parent.childNodes.forEach(function (child) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        fragment.appendChild(document.createTextNode(child.textContent || ""));
+        return;
+      }
+
+      if (child.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+
+      const tagName = child.tagName.toLocaleLowerCase();
+      if (!ALLOWED_DESCRIPTION_TAGS.has(tagName)) {
+        fragment.appendChild(sanitizeDescriptionChildren(child));
+        return;
+      }
+
+      const cleanNode = document.createElement(tagName);
+      if (tagName === "a") {
+        addSafeLinkAttributes(cleanNode, child);
+      }
+      cleanNode.appendChild(sanitizeDescriptionChildren(child));
+      fragment.appendChild(cleanNode);
+    });
+    return fragment;
+  }
+
+  function addSafeLinkAttributes(cleanNode, sourceNode) {
+    const href = sourceNode.getAttribute("href") || "";
+    if (isSafeDescriptionHref(href)) {
+      cleanNode.href = href;
+      cleanNode.rel = "noopener noreferrer nofollow";
+    }
+  }
+
+  function isSafeDescriptionHref(value) {
+    try {
+      const url = new URL(value, window.location.origin);
+      return ["http:", "https:", "mailto:", "tel:"].includes(url.protocol);
+    } catch (error) {
+      return false;
+    }
   }
 
   function stepperButton(label, onClick, title, extraClass) {

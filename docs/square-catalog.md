@@ -37,7 +37,8 @@ Optional but recommended:
 
 - a category
 - one or more images
-- a customer-facing description
+- a customer-facing description. If Square provides `description_html`, the
+  website displays that formatted HTML after client-side sanitization.
 
 Items with multiple variations are skipped by v1.
 
@@ -126,6 +127,8 @@ Expected result:
 - HTTP `200`
 - JSON array
 - only short keys: `i`, `v`, `n`, `p`, `d`, `c`, `m`, `q`
+- `d` contains Square `description_html` when available, otherwise Square
+  plaintext description data
 
 Checkout:
 
