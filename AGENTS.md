@@ -79,6 +79,7 @@ explain why. Do not silently introduce a new framework, bundler, or runtime.
 ├── index.md               # Home page.
 ├── 404.html               # GitHub Pages 404.
 ├── robots.txt
+├── inbox/              # Raw files from the user to be processed by the AI agent according to their instructions.
 └── .nojekyll              # Intentionally absent. We DO want Jekyll.
 ```
 
@@ -107,6 +108,10 @@ semantics cannot be expressed in Markdown (landing hero, complex forms, etc.).
    at `<h2>`. Do not skip heading levels.
 5. Verify locally (see §9) and check the page with a keyboard and a screen
    reader emulator.
+
+## Inbox
+
+The repo has an inbox which is used as a way for the user to easily provide raw files that will be processed by the AI agent according to their instructions. The user doesn't know how to use git, so they will drag-and drop files into this folder, then ask you to do something with them, e.g., "please add the images in the inbox to the events page." After processing the files in the inbox (resizing, parsing, processing, etc), move them to a suitable final location in the repo, and remove them from the inbox. Images should be resized to fit the usage according to web best practices (thumbnails and full size "lightbox" versions, etc).
 
 ## Design system
 
