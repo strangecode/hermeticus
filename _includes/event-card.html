@@ -1,0 +1,33 @@
+{%- comment -%}
+  Renders a single event as a list item.
+  Usage: {% include event-card.html event=event %}
+  `data-event-date` (ISO 8601) lets assets/js/main.js re-bucket the event
+  into Upcoming / Past by the visitor's current date. With JS disabled, the
+  build-time placement in pages/events.md stands.
+{%- endcomment -%}
+<li data-event-date="{{ include.event.date | date: '%Y-%m-%d' }}">
+  <article class="event-card{% if include.event.image %} event-card--media{% endif %}">
+    {%- if include.event.image -%}
+    <figure class="event-card__media">
+      <img
+        class="event-card__image"
+        src="{{ include.event.image | relative_url }}"
+        alt="{{ include.event.image_alt | default: include.event.title | strip }}"
+        loading="lazy">
+    </figure>
+    {%- endif -%}
+    <div class="event-card__body">
+      <p class="event-card__when">
+        <time datetime="{{ include.event.date | date: '%Y-%m-%d' }}">{{ include.event.date | date: "%A, %B %-d, %Y" }}</time>{% if include.event.time %}<span class="event-card__time"> &middot; {{ include.event.time }}</span>{% endif %}
+      </p>
+      <h3 class="event-card__title">{{ include.event.title }}</h3>
+      {%- if include.event.location or include.event.cost -%}
+      <ul class="event-card__meta" role="list">
+        {%- if include.event.location -%}<li>{{ include.event.location }}</li>{%- endif -%}
+        {%- if include.event.cost -%}<li>{{ include.event.cost }}</li>{%- endif -%}
+      </ul>
+      {%- endif -%}
+      {%- if include.event.description -%}<p class="event-card__description">{{ include.event.description | strip }}</p>{%- endif -%}
+    </div>
+  </article>
+</li>

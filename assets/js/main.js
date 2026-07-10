@@ -809,3 +809,98 @@
     }).format(amount / 100);
   }
 })();
+
+/*
+ * Events scheduling — progressive enhancement.
+ *
+ * The Events page (pages/events.md) is rendered with a build-time split into
+ * "Upcoming" and "Past". This module refines that split to the visitor's
+ * CURRENT date on each visit: an event moves to Past the day AFTER its date,
+ * and Past events are hidden once they are older than the retention window
+ * (data-events-retention-days). With JavaScript disabled, the build-time
+ * split stands, so the page remains correct and usable.
+ */
+(function () {
+  "use strict";
+
+  const container = document.querySelector("[data-events]");
+  if (!container) {
+    return;
+  }
+
+  const upcomingList = container.querySelector('[data-events-list="upcoming"]');
+  const pastList = container.querySelector('[data-events-list="past"]');
+  if (!upcomingList || !pastList) {
+    return;
+  }
+
+  const pastSection = container.querySelector('[data-events-section="past"]');
+  const upcomingEmpty = container.querySelector('[data-events-empty="upcoming"]');
+
+  const retentionDays =
+    parseInt(container.getAttribute("data-events-retention-days"), 10) || 30;
+
+  const DAY_MS = 86400000;
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // Parse "YYYY-MM-DD" as a LOCAL midnight date so comparisons stay on calendar
+  // days and never slip by a day across time zones (as new Date(str) can).
+  function parseEventDate(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value || "");
+    if (!match) {
+      return null;
+    }
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  const items = Array.prototype.slice.call(
+    container.querySelectorAll("[data-event-date]")
+  );
+
+  const upcoming = [];
+  const past = [];
+
+  items.forEach(function (item) {
+    const date = parseEventDate(item.getAttribute("data-event-date"));
+    if (!date) {
+      return; // Leave anything unparseable exactly where the build placed it.
+    }
+    const daysSince = Math.floor((todayMidnight - date) / DAY_MS);
+    if (daysSince <= 0) {
+      upcoming.push({ item: item, date: date }); // today or future
+    } else if (daysSince <= retentionDays) {
+      past.push({ item: item, date: date }); // within the retention window
+    } else {
+      item.hidden = true; // older than retention: remove from view
+    }
+  });
+
+  // Upcoming: soonest first. Past: most recent first.
+  upcoming.sort(function (a, b) {
+    return a.date - b.date;
+  });
+  past.sort(function (a, b) {
+    return b.date - a.date;
+  });
+
+  // Move each event into its correct list, in order. appendChild relocates an
+  // existing node, so this both re-buckets and re-sorts in one pass.
+  upcoming.forEach(function (entry) {
+    entry.item.hidden = false;
+    upcomingList.appendChild(entry.item);
+  });
+  past.forEach(function (entry) {
+    entry.item.hidden = false;
+    pastList.appendChild(entry.item);
+  });
+
+  // Reveal the Past section only when it has events; show the Upcoming
+  // empty-state only when there are none.
+  if (pastSection) {
+    pastSection.hidden = past.length === 0;
+  }
+  if (upcomingEmpty) {
+    upcomingEmpty.hidden = upcoming.length !== 0;
+  }
+})();

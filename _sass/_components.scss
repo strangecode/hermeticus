@@ -272,5 +272,12 @@ select.field__control {
 
 .events-empty { color: var(--color-text-muted); }
 
+/* Space between the Upcoming and Past sections (only when Past is shown). */
+.events-schedule > section + section { margin-top: var(--space-8); }
+
+/* Ensure events or sections hidden by the scheduling script (or at build
+   time) are fully removed from the grid flow, not just visually collapsed. */
+.events-schedule [hidden] { display: none !important; }
+
 /* ---- Home page ------------------------------------------------------- */
 .home .section { background-color: var(--color-bg); }
