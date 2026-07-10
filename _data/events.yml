@@ -17,8 +17,7 @@
   description: >-
     Come all poets and lovers of poetry! Come to share or simply to listen —
     all are welcome.
-  # Add the photo file to assets/images/ then uncomment the two lines below.
-  # image: /assets/images/open-mike-poetry-reading.jpg
-  # image_alt: >-
-  #   Poets and listeners gathered in a circle for a reading inside Hermeticus
-  #   Bookshop, the shop's front window and book-lined shelves behind them.
+  image: /assets/images/open-mike-poetry-reading.jpg
+  image_alt: >-
+    Poets and listeners gathered in a circle for a reading inside Hermeticus
+    Bookshop, the shop's front window and book-lined shelves behind them.

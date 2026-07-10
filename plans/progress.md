@@ -100,3 +100,8 @@ Suggested entry format:
 - summary: Replaced the `/events/` placeholder with a data-driven listing sourced from a new `_data/events.yml`, added an `.event-card` component to `_sass/_components.scss` with a responsive photo/text media layout, and seeded the first event (Open Mike Poetry Reading, 2026-07-17). Build and desktop/mobile layouts validated via headless Chromium.
 - reason: The user asked to add the poetry reading event and design the events page in the site's existing style.
 - follow-up: The event photo arrived only as a chat preview, not a saved file, so `image`/`image_alt` are pre-wired but commented out in `_data/events.yml`. When the file is provided, save it to `assets/images/open-mike-poetry-reading.jpg` and uncomment those two lines to enable the two-column media layout.
+
+## 2026-07-10 – P-003 – events-page – completed
+- summary: Processed the Open Mike photo the user dropped in `inbox/` (1536x1024 JPEG): resized to 1200x800 and re-encoded as an optimized progressive JPEG (542KB → 191KB) with Pillow, saved it to `assets/images/open-mike-poetry-reading.jpg`, enabled the `image`/`image_alt` fields in `_data/events.yml`, and cleared the inbox. The event card now renders the two-column photo layout, verified via headless Chromium.
+- reason: The `inbox/` workflow (documented in AGENTS.md) is how the nontechnical user hands over raw files; the earlier blocker was that chat-attached images never reach disk, which the inbox solves.
+- follow-up: None. To swap the photo later, drop a new file in `inbox/`, re-run the resize, and replace `assets/images/open-mike-poetry-reading.jpg`.
