@@ -214,12 +214,17 @@ self-contained set of changes:
 1. **Commit and push to `main`.** `git push origin main`. Verify the branch is
    `main`, not a feature branch.
 2. **Wait a couple of minutes** for the GitHub Pages build to run and publish.
-3. **Verify on production** by fetching the affected page(s) at
-   <https://hermeticus.org/> and confirming the new content is actually present
+3. **Verify the deploy.** Preferred: fetch the affected page(s) at
+   <https://hermeticus.org/> and confirm the new content is actually present
    (e.g. `curl -s https://hermeticus.org/events/ | grep -i "open mike"`). Do not
    rely on the local build alone. If the change has not appeared, wait and
-   re-check before reporting success — a red or missing Pages build means the
-   deploy failed and must be investigated, not assumed.
+   re-check before reporting success.
+   - Some sandboxes run a restricted network policy that blocks outbound
+     requests to `hermeticus.org` (curl returns HTTP `000`). When production is
+     unreachable that way, verify instead via GitHub: the authoritative signal
+     is that the latest **"pages build and deployment"** run for the pushed
+     commit on `main` concluded `success`. A failed or missing Pages run means
+     the deploy failed and must be investigated, not assumed live.
 4. **Give the user the live URL** to the page you changed, as a clickable link,
    so they can view the new work themselves.
 
