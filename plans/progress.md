@@ -95,3 +95,8 @@ Suggested entry format:
 - summary: Archived `P-002` after user review confirmed the catalog QoL work is complete.
 - reason: The browsing controls, cart persistence, image lightbox, post-review polish, and asset cache-busting fixes were implemented, validated, committed, and pushed.
 - follow-up: No immediate P-002 work remains. Future catalog changes should start from a new plan or a targeted follow-up request.
+
+## 2026-07-10 – P-003 – events-page – completed
+- summary: Replaced the `/events/` placeholder with a data-driven listing sourced from a new `_data/events.yml`, added an `.event-card` component to `_sass/_components.scss` with a responsive photo/text media layout, and seeded the first event (Open Mike Poetry Reading, 2026-07-17). Build and desktop/mobile layouts validated via headless Chromium.
+- reason: The user asked to add the poetry reading event and design the events page in the site's existing style.
+- follow-up: The event photo arrived only as a chat preview, not a saved file, so `image`/`image_alt` are pre-wired but commented out in `_data/events.yml`. When the file is provided, save it to `assets/images/open-mike-poetry-reading.jpg` and uncomment those two lines to enable the two-column media layout.

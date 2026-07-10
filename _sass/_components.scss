@@ -183,5 +183,94 @@ select.field__control {
   margin-bottom: var(--space-5);
 }
 
+/* ---- Event ----------------------------------------------------------- */
+.event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-6);
+}
+
+.event-list > li { margin: 0; }
+
+.event-card {
+  background-color: var(--color-bg);
+  border: var(--border-thin);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Media variant: photo beside the details on wider screens, stacked below it
+   on narrow ones. Without a photo the card is a single text column. */
+.event-card--media { display: grid; }
+
+@media (min-width: 40rem) {
+  .event-card--media {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+.event-card__media {
+  margin: 0;
+  background-color: var(--color-surface);
+}
+
+.event-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 15rem;
+  object-fit: cover;
+}
+
+.event-card__body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.event-card__when {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--step--1);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.event-card__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.event-card__meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+  font-size: var(--step--1);
+}
+
+.event-card__meta li { margin: 0; }
+
+.event-card__description {
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+.events-empty { color: var(--color-text-muted); }
+
 /* ---- Home page ------------------------------------------------------- */
 .home .section { background-color: var(--color-bg); }
