@@ -201,6 +201,28 @@ or open pull requests!**
 
 Pushing to `origin main` triggers the GitHub Pages build automatically. This should be done whenever the user asks to make a change to the website. Jekyll compiles the site and publishes it; there is no separate deploy step. This means every push to `main` is a production deployment, which is desired behavior. When the user asks you to change the website, they implicitly are asking for: change directly on main branch → commit to main → push to origin/main → auto-deploys.
 
+Some environments hand the agent a scratch/feature branch by default. Ignore
+it. The website only deploys from `main`, so a commit sitting on any other
+branch does **nothing** for the user. Always confirm your work is on `main`
+(`git branch --show-current` should print `main`) before and after pushing.
+
+### After every atomic set of changes (required)
+
+A change is not "done" until it is live and confirmed. After completing each
+self-contained set of changes:
+
+1. **Commit and push to `main`.** `git push origin main`. Verify the branch is
+   `main`, not a feature branch.
+2. **Wait a couple of minutes** for the GitHub Pages build to run and publish.
+3. **Verify on production** by fetching the affected page(s) at
+   <https://hermeticus.org/> and confirming the new content is actually present
+   (e.g. `curl -s https://hermeticus.org/events/ | grep -i "open mike"`). Do not
+   rely on the local build alone. If the change has not appeared, wait and
+   re-check before reporting success — a red or missing Pages build means the
+   deploy failed and must be investigated, not assumed.
+4. **Give the user the live URL** to the page you changed, as a clickable link,
+   so they can view the new work themselves.
+
 ## Commit hygiene
 
 - Small, focused commits. One logical change per commit.
