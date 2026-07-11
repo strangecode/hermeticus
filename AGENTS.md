@@ -304,17 +304,16 @@ self-contained set of changes:
 
 ## Project Planning
 
-This project uses a formal project planning system. Use it for all non-trivial work. Before updating plans or documentation, load the `project-planning` skill.
+This project uses a formal project planning system. Before updating plans or documentation, load the `project-planning` skill.
 
 | Document | Purpose |
 |---|---|
 | `plans/queue/` | Plans not yet started |
 | `plans/active/` | Plans in progress |
 | `plans/archive/` | Completed plans |
-| `plans/progress.md` | Concise outcome summaries |
 | `docs/architecture.md` | Current stable technical map of the system |
 | `docs/decisions.md` | Durable rationale log for technical decisions |
 
-- Plan IDs (`P-xxx`) must be unique.
-- Perform a plan review before coding.
-- These are living documents that must stay current as work progresses.
+- These are living documents that must stay current as work progresses
+- Run `plan add <title>` to create a plan file after user approval
+- Perform a plan review before coding
