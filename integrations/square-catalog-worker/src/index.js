@@ -1,9 +1,12 @@
+import shippingRates from "../shipping-rates.json" with { type: "json" };
+
 const DEFAULT_TTL_SECONDS = 300;
 const DEFAULT_SQUARE_VERSION = "2026-01-22";
-const SQUARE_TYPES = "ITEM,CATEGORY,IMAGE";
+const SQUARE_TYPES = "ITEM,CATEGORY,IMAGE,CUSTOM_ATTRIBUTE_DEFINITION";
+const CATALOG_SCHEMA_VERSION = "2";
 const MAX_CART_LINES = 50;
 const MAX_INVENTORY_BATCH = 1000;
-const MAX_SHIPPING_FEE_CENTS = 10000;
+const SHIPPING_CONFIG = validateShippingConfig(shippingRates);
 
 export default {
   async fetch(request, env, ctx) {
@@ -72,14 +75,10 @@ async function handleCatalogRequest(request, env, ctx, runtime, allowedOrigin) {
 
 async function handleCheckoutRequest(request, env, runtime, allowedOrigin) {
   const cart = await parseCheckoutBody(request);
-  const shippingFee = Number(env.SHIPPING_FEE_CENTS);
-  if (!Number.isInteger(shippingFee) || shippingFee < 1 || shippingFee > MAX_SHIPPING_FEE_CENTS) {
-    throw createHttpError(500, "Worker configuration has an invalid SHIPPING_FEE_CENTS.");
-  }
-
   const liveCatalog = await loadPublicCatalog(env, runtime.fetchImpl);
   const itemByVariationId = new Map(liveCatalog.map((item) => [item.v, item]));
   const lineItems = cart.items.map((item) => validateCartLine(item, itemByVariationId));
+  const shippingFee = calculateShipping(lineItems);
 
   const paymentLink = await createPaymentLink(lineItems, shippingFee, env, runtime.fetchImpl);
   return withCors(jsonResponse({ u: paymentLink }), allowedOrigin);
@@ -92,8 +91,14 @@ async function loadPublicCatalog(env, fetchImpl) {
   const catalogItems = objects.filter((object) => object.type === "ITEM");
   const categories = buildObjectMap(objects, "CATEGORY", "category_data");
   const images = buildObjectMap(objects, "IMAGE", "image_data");
+  const weightDefinitionIds = new Set(
+    objects
+      .filter((object) => object.type === "CUSTOM_ATTRIBUTE_DEFINITION")
+      .filter((object) => object.custom_attribute_definition_data?.name === SHIPPING_CONFIG.weightAttributeName)
+      .map((object) => object.id),
+  );
   const candidateItems = catalogItems
-    .map((item) => extractCatalogCandidate(item, categories, images))
+    .map((item) => extractCatalogCandidate(item, categories, images, weightDefinitionIds))
     .filter(Boolean);
 
   const inventory = await fetchInventoryCounts(
@@ -183,12 +188,11 @@ async function createPaymentLink(lineItems, shippingFee, env, fetchImpl) {
         checkout_options: {
           redirect_url: `${getPrimaryOrigin(env)}/books/?checkout=success`,
           ask_for_shipping_address: true,
-          custom_fields: [{ title: "US shipping only - type YES to confirm" }],
           shipping_fee: {
-            name: "Flat-rate shipping",
+            name: shippingFee === 0 ? "Free shipping" : "Shipping",
             charge: {
               amount: shippingFee,
-              currency: "USD",
+              currency: SHIPPING_CONFIG.currency,
             },
           },
         },
@@ -206,7 +210,7 @@ async function createPaymentLink(lineItems, shippingFee, env, fetchImpl) {
   return paymentLink;
 }
 
-function extractCatalogCandidate(object, categories, images) {
+function extractCatalogCandidate(object, categories, images, weightDefinitionIds) {
   const item = object.item_data || {};
   const variations = item.variations || [];
 
@@ -241,6 +245,7 @@ function extractCatalogCandidate(object, categories, images) {
   const imageUrls = imageIds
     .map((imageId) => images.get(imageId)?.url)
     .filter(Boolean);
+  const weight = extractShippingWeight(object, variation, weightDefinitionIds);
 
   return {
     i: object.id,
@@ -250,6 +255,7 @@ function extractCatalogCandidate(object, categories, images) {
     d: description,
     c: categoryName,
     m: imageUrls,
+    w: weight,
   };
 }
 
@@ -279,7 +285,72 @@ function validateCartLine(item, itemByVariationId) {
     throw createHttpError(409, `${catalogItem.n} no longer has enough stock.`);
   }
 
-  return item;
+  return { ...item, w: catalogItem.w };
+}
+
+export function validateShippingConfig(config) {
+  const scalarSettingsAreValid = [
+    config?.currency === "USD",
+    typeof config?.weightAttributeName === "string" && config.weightAttributeName.trim().length > 0,
+    Number.isFinite(config?.freeItemMaximumPounds) && config.freeItemMaximumPounds >= 0,
+    Number.isInteger(config?.weightRateCentsPerPound) && config.weightRateCentsPerPound > 0,
+    Number.isInteger(config?.freeShippingBelowCents) && config.freeShippingBelowCents >= 0,
+    Number.isInteger(config?.minimumShippingCents) &&
+      config.minimumShippingCents >= config.freeShippingBelowCents,
+  ].every(Boolean);
+  const rates = config?.perItemRatesCents;
+  const rateSettingsAreValid = rates && typeof rates === "object" && [
+    ...Array.from({ length: 24 }, (_, index) => String(index + 1)),
+    "25+",
+  ].every((key) => Number.isInteger(rates[key]) && rates[key] >= 0);
+
+  if (!scalarSettingsAreValid || !rateSettingsAreValid) {
+    throw new Error("Shipping configuration is invalid.");
+  }
+
+  return config;
+}
+
+export function calculateShipping(lineItems, config = SHIPPING_CONFIG) {
+  const rules = validateShippingConfig(config);
+  let qualifyingItemCount = 0;
+  let weightedPounds = 0;
+  let hasNullWeight = false;
+  let hasPaidWeight = false;
+
+  for (const item of lineItems) {
+    if (item.w === null) {
+      hasNullWeight = true;
+      qualifyingItemCount += item.q;
+      continue;
+    }
+    if (item.w <= rules.freeItemMaximumPounds) {
+      continue;
+    }
+
+    hasPaidWeight = true;
+    qualifyingItemCount += item.q;
+    weightedPounds += item.w * item.q;
+  }
+
+  const perItemKey = qualifyingItemCount >= 25 ? "25+" : String(qualifyingItemCount);
+  const perItemFee = hasNullWeight ? rules.perItemRatesCents[perItemKey] : 0;
+  const rawWeightFee = Math.ceil(weightedPounds * rules.weightRateCentsPerPound);
+  if (!Number.isSafeInteger(rawWeightFee)) {
+    throw createHttpError(500, "Calculated shipping exceeds the supported amount.");
+  }
+
+  let weightFee = rawWeightFee;
+  if (weightFee < rules.freeShippingBelowCents) {
+    weightFee = 0;
+  } else if (weightFee <= rules.minimumShippingCents) {
+    weightFee = rules.minimumShippingCents;
+  }
+
+  if (hasNullWeight && hasPaidWeight) {
+    return Math.max(perItemFee, weightFee);
+  }
+  return hasNullWeight ? perItemFee : weightFee;
 }
 
 export async function parseCheckoutBody(request) {
@@ -331,7 +402,24 @@ function buildObjectMap(objects, type, key) {
 function buildCacheKey(request) {
   const url = new URL(request.url);
   url.search = "";
+  url.searchParams.set("schema", CATALOG_SCHEMA_VERSION);
   return new Request(url.toString(), { method: "GET" });
+}
+
+function extractShippingWeight(item, variation, weightDefinitionIds) {
+  for (const values of [variation.custom_attribute_values, item.custom_attribute_values]) {
+    const attribute = Object.values(values || {}).find((value) =>
+      weightDefinitionIds.has(value.custom_attribute_definition_id) ||
+      value.name === SHIPPING_CONFIG.weightAttributeName);
+    if (!attribute) {
+      continue;
+    }
+
+    const weight = Number(attribute.number_value ?? attribute.string_value);
+    return Number.isFinite(weight) && weight >= 0 ? weight : null;
+  }
+
+  return null;
 }
 
 function buildCacheControl(env) {

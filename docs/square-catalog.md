@@ -39,8 +39,11 @@ Optional but recommended:
 - one or more images
 - a customer-facing description. If Square provides `description_html`, the
   website displays that formatted HTML after client-side sanitization.
+- a seller-visible number custom attribute named exactly `Shipping weight (lb)` when the product should use weight pricing or free shipping. A variation value overrides an item value. Leave it empty for normal per-item rates and use `0.1` for free-shipping products.
 
 Items with multiple variations are skipped by v1.
+
+Square's native Dashboard **Weight** field is not exposed by the public Catalog API. Only the custom attribute affects this Worker.
 
 ## Worker Configuration
 
@@ -52,7 +55,6 @@ Items with multiple variations are skipped by v1.
 - `CATALOG_TTL_SECONDS`
 - `SQUARE_VERSION`
 - `SQUARE_LOCATION_ID`
-- `SHIPPING_FEE_CENTS`
 
 Before deploy, set these values as needed:
 
@@ -60,7 +62,16 @@ Before deploy, set these values as needed:
 - `SQUARE_ENV` should be `production` unless testing against Square sandbox
 - `SQUARE_LOCATION_ID` must be set for the location used by the shop
 - `CATALOG_TTL_SECONDS` defaults to `300`
-- `SHIPPING_FEE_CENTS` is the flat per-order shipping charge in US cents and is currently `500` ($5.00). Checkout rejects missing, zero, malformed, or unexpectedly high values before contacting Square.
+
+Shipping prices and thresholds live in `integrations/square-catalog-worker/shipping-rates.json`. Money values use US cents and weights use pounds. The Worker validates this file when its module loads.
+
+## Shipping Calculation
+
+- Products without `Shipping weight (lb)` use the `perItemRatesCents` quantity table: $5 for one item, $6 for two, increasing by $1 per item through $28 for 24 items, then $30 for 25 or more.
+- Products from 0 through 0.1 lb are free-shipping products and are excluded from every item and weight total.
+- Other weighted products cost $2 per pound. The Worker multiplies weight by quantity and rounds fractional cents up. A result below $1 becomes free, a result from $1 through $5 becomes $5, and a result above $5 is unchanged.
+- A cart containing only null weights uses the quantity table. A cart containing only paid weights uses the weight result. A mixed cart uses the higher of the weight result and the quantity-table result for all non-free products.
+- Missing, negative, or malformed weights become `null`, which avoids accidental free shipping.
 
 The secret token must never be committed:
 
@@ -74,7 +85,7 @@ npx wrangler secret put SQUARE_ACCESS_TOKEN \
 From the repo root:
 
 ```bash
-npm install --cache /var/folders/sd/sqyq8bqd6bj1vjh9v7f_5ddc0000gp/T/hermeticus-npm-cache \
+npm install --cache "${TMPDIR}/hermeticus-npm-cache" \
   --prefix integrations/square-catalog-worker
 npm test --prefix integrations/square-catalog-worker
 ```
@@ -98,7 +109,7 @@ npx wrangler secret put SQUARE_ACCESS_TOKEN \
   --config integrations/square-catalog-worker/wrangler.toml
 ```
 
-3. Confirm the non-secret Cloudflare account ID, Square location ID, and shipping fee before deploy. Keep these deploy-time values in `wrangler.toml` or the Cloudflare dashboard, but never store the access token in the repo. If the shipping fee changes, update the customer-facing disclosure in `_includes/square-catalog.html` in the same change.
+3. Confirm the non-secret Cloudflare account ID and Square location ID before deploy. Review `shipping-rates.json` when prices change, but never store the access token in the repo.
 
 4. Deploy:
 
@@ -129,9 +140,10 @@ Expected result:
 
 - HTTP `200`
 - JSON array
-- only short keys: `i`, `v`, `n`, `p`, `d`, `c`, `m`, `q`
+- only short keys: `i`, `v`, `n`, `p`, `d`, `c`, `m`, `w`, `q`
 - `d` contains Square `description_html` when available, otherwise Square
   plaintext description data
+- `w` is a number of pounds from the configured Square custom attribute or `null`
 
 Checkout:
 
@@ -147,9 +159,9 @@ Expected result:
 - HTTP `200`
 - JSON containing `u`
 - the `u` value opens a Square-hosted checkout page
-- the checkout page adds a $5.00 "Flat-rate shipping" charge
+- the checkout page adds the shipping amount calculated from the current catalog and `shipping-rates.json`
 - the checkout page requires the buyer's name, phone number, and shipping address, creating a `SHIPMENT` fulfillment
-- the checkout page requires the buyer to type `YES` in a "US shipping only" confirmation field
+- the checkout page has no US-confirmation custom field
 
 Shipping collection is driven entirely by the `CreatePaymentLink` request (`checkout_options.ask_for_shipping_address`), not by Square dashboard settings. After the buyer pays, the address is stored on the order in `fulfillments[].shipment_details`. The website and Worker do not store customer addresses.
 
@@ -158,13 +170,13 @@ Shipping collection is driven entirely by the `CreatePaymentLink` request (`chec
 Square Orders Manager is the source of truth for fulfillment:
 
 1. Open the paid order in Square Orders Manager. Do not ship from a website return message alone.
-2. Confirm the payment is completed and review the books, US-shipping confirmation, recipient, phone number, and shipping address. If the address is outside the United States, contact the buyer and refund the order instead of shipping it at the domestic flat rate.
+2. Confirm the payment is completed and review the products, recipient, phone number, and shipping address. If the address is outside the United States, contact the buyer and refund the order instead of shipping it at the domestic rate.
 3. Pack and send the books using the shop's normal mailing method.
 4. Record tracking information when available and complete the fulfillment manually in Square Orders Manager. Payment-link orders with fulfillments remain open until this step.
 
 Square Checkout API links are single-use and are created separately for each cart. The links themselves are not managed like reusable Dashboard payment links.
 
-Square's hosted Checkout API does not provide a country allowlist. The cart discloses the US-only policy, Square requires the buyer to confirm it, and the shop verifies the country before fulfillment.
+Square's hosted Checkout API does not provide a country allowlist. Checkout accepts any country without a custom confirmation field, and the shop verifies the country before fulfillment.
 
 ### Public Site
 
@@ -173,14 +185,15 @@ After the repo is pushed:
 - `/books/` shows live books from Square
 - a buyer can add multiple distinct books to the cart
 - clicking checkout redirects to Square
-- the cart discloses US-only, $5 flat-rate shipping before checkout
+- the cart explains that shipping is calculated at checkout and that non-US orders may be canceled and refunded
 - reducing stock to zero or archiving a book removes it after cache refresh
 
 ## Operational Notes
 
 - `GET /catalog` is edge-cached to reduce load on Square.
 - `POST /checkout` always validates against live Square data instead of using the cached public payload.
-- `POST /checkout` fails before contacting Square if the configured shipping fee is unsafe.
+- `POST /checkout` calculates shipping only from the fresh server-side catalog; browser-supplied weights are never trusted.
+- Invalid shipping configuration prevents the Worker from starting, and an unsafe calculated amount fails closed without creating a payment link.
 - The worker fails closed. If validation or Square access fails during checkout creation, no payment link is created.
 
 ## Rollback

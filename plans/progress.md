@@ -115,3 +115,8 @@ Suggested entry format:
 - summary: Added red-first coverage and implementation for a guarded $5.00 US flat shipping charge, required address collection and US-policy confirmation on Square, disclosed the rate in the cart, documented manual fulfillment, and deployed the Worker. A production checkout confirmed the shipping line, required fields, and total without payment.
 - reason: Address collection alone did not calculate or charge shipping, and paid payment-link fulfillments require an explicit seller workflow.
 - follow-up: Archive P-005 after user confirmation.
+
+## 2026-07-10 – P-005 – complete-shippable-square-checkout – partial
+- summary: Replaced flat shipping with validated JSON quantity and weight rules, exposed Square custom weights as `w`, removed the US-confirmation field, documented the seller workflow, and deployed Worker version `d962bbad-8931-4e0a-91dd-62f9efc9acb2`.
+- reason: Postcards need free shipping, heavy products need weight-aware pricing, and ordinary books need a safe configuration-free default.
+- follow-up: Verify the live catalog and paid/free checkout links when outbound execution approval is available, then archive P-005 after user confirmation.

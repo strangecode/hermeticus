@@ -24,7 +24,7 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
   - `POST /checkout` for server-validated cart checkout creation
   The worker is the only component that talks to Square APIs.
 - **Square Catalog API**
-  Source of item, category, image, and variation data.
+  Source of item, category, image, variation, and seller-visible custom-attribute data. A number custom attribute named `Shipping weight (lb)` bridges product weights into the Worker because Square does not expose its native Dashboard shipping-weight field through this API.
 - **Square Inventory API**
   Source of the current stock count for each published book at one configured Square location.
 - **Square Checkout API**
@@ -37,7 +37,7 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
 3. `assets/js/main.js` reads `square_catalog_api_base` from `_config.yml`, restores any previously saved cart lines from browser `localStorage`, and requests `GET <worker>/catalog`.
 4. The worker checks Cloudflare edge cache.
 5. On a cache miss, the worker:
-   - paginates through Square `ListCatalog` for `ITEM`, `CATEGORY`, and `IMAGE`
+   - paginates through Square `ListCatalog` for `ITEM`, `CATEGORY`, `IMAGE`, and `CUSTOM_ATTRIBUTE_DEFINITION`
    - extracts items that are publishable for v1
    - retrieves inventory counts for candidate variation IDs at `SQUARE_LOCATION_ID`
    - returns a compact JSON array with short keys
@@ -46,7 +46,7 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
 7. Client-side search, category filtering, and sorting run entirely against the already loaded catalog array without further network requests.
 8. The browser persists cart lines in `localStorage`, reconciles them against the freshly loaded catalog on page load, and silently drops lines that are no longer valid.
 9. When the buyer checks out, `assets/js/main.js` sends `POST <worker>/checkout` with variation IDs and requested quantities.
-10. The worker validates the configured flat shipping fee, bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, and creates a Square-hosted payment link with the shipping charge and required address collection.
+10. The worker bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, calculates shipping from the trusted quantities and weights using `shipping-rates.json`, and creates a Square-hosted payment link with required address collection.
 11. The browser redirects the buyer to Square’s checkout page. Square stores the paid buyer's address in a `SHIPMENT` fulfillment. On a `?checkout=success` return, the client clears the saved cart and shows a payment-complete message.
 12. The shop ships the books and manually completes the paid fulfillment in Square Orders Manager.
 
@@ -60,6 +60,7 @@ The public catalog payload uses these keys:
   otherwise Square plaintext description data.
 - `c` category name
 - `m` image URL list
+- `w` shipping weight in pounds, or `null` when no valid custom weight is specified
 - `q` quantity available
 
 The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
@@ -68,6 +69,7 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 
 - No database is used by the site or worker.
 - Catalog browse results are cached at Cloudflare edge with a short TTL.
+- Shipping rules are bundled from `integrations/square-catalog-worker/shipping-rates.json`; no rate environment variable or database is used.
 - The `/books/` page stores cart state in browser `localStorage` under a repo-owned key. This storage is client-side only and is treated as disposable convenience state, not a source of truth.
 - Secrets are stored only in Cloudflare Worker secrets:
   - `SQUARE_ACCESS_TOKEN`
@@ -77,7 +79,6 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
   - `SQUARE_LOCATION_ID`
   - `CATALOG_TTL_SECONDS`
   - `SQUARE_VERSION`
-  - `SHIPPING_FEE_CENTS`
 - Site-side worker location is configured in `_config.yml` through `square_catalog_api_base`.
 - External runtime dependencies:
   - GitHub Pages / Jekyll
@@ -89,9 +90,11 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 - The public Git repository contains no Square or Cloudflare secrets.
 - Payment card entry never happens on `hermeticus.org`; buyers complete payment on Square-hosted checkout.
 - Customer shipping addresses remain in Square and are not stored by Hermeticus.
-- Checkout must fail before contacting Square when `SHIPPING_FEE_CENTS` is not an integer from 1 through 10000.
-- The customer-facing shipping disclosure and Worker shipping fee must remain equal.
-- The flat rate applies to US addresses. Square cannot enforce a hosted-checkout country allowlist, so the policy is disclosed before checkout, confirmed in a required Square field, and verified before fulfillment.
+- Shipping configuration must pass structural and currency validation when the Worker module loads.
+- Missing, negative, or malformed catalog weights become `null` and use per-item shipping; weights from 0 through 0.1 lb are excluded from shipping.
+- Null-weight-only carts use the configured quantity table. Weighted-only carts use the rounded-up per-pound result with its free and minimum thresholds. Mixed carts use the higher of the weight result and the quantity-table result for all non-free items.
+- The current quantity table charges $5 for one qualifying item, adds $1 per item through $28 for 24, and charges $30 for 25 or more. Weight pricing is $2 per pound, calculated amounts below $1 are free, and amounts from $1 through $5 use a $5 minimum.
+- Square collects any shipping country and no custom confirmation field is used. The shop cancels and refunds non-US orders during fulfillment review.
 - Only items with exactly one sellable variation and positive tracked inventory at the configured Square location are published on `/books/`.
 - Items with zero inventory or archived state disappear from the public catalog after cache refresh.
 - `GET /catalog` is cacheable; `POST /checkout` must validate against fresh Square data before creating a checkout link.

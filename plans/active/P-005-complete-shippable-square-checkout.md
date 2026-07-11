@@ -2,86 +2,77 @@
 
 ## Purpose
 
-Customers can see and pay a predictable shipping charge, must provide a shipping address on Square, and receive accurate confirmation copy. The shop can fulfill paid orders through Square Orders Manager without storing customer addresses on Hermeticus.
-
-## Context and Orientation
-
-`integrations/square-catalog-worker/src/index.js` creates Square payment links after live inventory validation. `assets/js/main.js` redirects buyers to Square and handles the return message. Square creates a `SHIPMENT` fulfillment when `ask_for_shipping_address` is enabled, but the current request has no shipping fee and the runbook does not explain manual fulfillment.
+Customers provide a shipping address and pay a predictable shipping charge calculated from the live Square catalog. Ordinary books need no weight setup, light products can ship free, and rate changes require editing one JSON file and redeploying the Worker.
 
 ## Unknowns
 
-- Known knowns: Square supports a fixed `checkout_options.shipping_fee`; the shop is in Ashland, Oregon; checkout uses USD.
-- Known unknowns: no existing shipping rate or carrier account is configured.
-- Unknown unknowns: production checkout behavior can differ from Square Sandbox.
-- References: Square Checkout API documentation confirms that shipping-address collection creates a `SHIPMENT` fulfillment and that `shipping_fee` is a separate checkout option.
-- Assumptions carried forward: charge a configurable $5.00 flat rate for US orders; disclose Square's lack of a country allowlist; use Square Orders Manager as the operational fulfillment system; do not retain addresses or order state in Hermeticus.
+- Square's public Catalog API does not expose the Dashboard's native shipping-weight field. Use a seller-visible `Shipping weight (lb)` number custom attribute, which is editable in Square Dashboard and returned by the API.
+- A variation-level custom weight overrides an item-level value. Missing, negative, or malformed values become `null` so checkout charges the safer per-item rate.
+- Square checkout accepts one calculated shipping service charge. A zero-dollar order sends an explicit `Free shipping` charge so checkout names the result clearly.
+- Rates are USD-only and destination-independent. International orders remain possible and are canceled manually by the shop.
 
 ## Scope
 
-Include a required Worker shipping-fee configuration, Square request construction, storefront disclosure and confirmation copy, automated tests, deployment instructions, architecture and decision records, Worker deployment, and production verification. Exclude carrier APIs, destination-based rates, a second order database, customer accounts, and automated fulfillment updates.
+Include compact catalog weights, JSON rate configuration and validation, per-item/weight/mixed-cart calculation, free shipping, Square request construction, storefront disclosure, automated tests, runbook and architecture updates, Worker deployment, and production verification. Exclude carrier APIs, destination validation, a second item database, customer accounts, and automated fulfillment updates.
 
 ## Deliverables
 
-- Checkout charges $5.00 US shipping, discloses the country policy, and requires the buyer's shipping address.
-- Missing or invalid shipping configuration fails closed before Square checkout creation.
-- Storefront copy discloses the rate and accurately describes the post-payment state.
-- The runbook explains how to find, ship, and complete paid orders in Square.
-- Tests cover the happy path and every new configuration error path.
+- `GET /catalog` returns `w` in pounds or `null` for every item.
+- Checkout excludes items at or below 0.1 lb from shipping, applies the configured per-item or weight rule, and uses the higher candidate for mixed carts.
+- Free-shipping orders send a zero-dollar `Free shipping` charge; paid shipping uses the calculated amount and neither path has a custom confirmation field.
+- A validated JSON file is the only code-side source of shipping rates.
+- README instructions explain rate edits and Square weight setup; durable docs describe the API and rationale.
 
 ## Interfaces and Dependencies
 
+- `integrations/square-catalog-worker/shipping-rates.json`
 - `integrations/square-catalog-worker/src/index.js`
 - `integrations/square-catalog-worker/test/catalog-worker.test.js`
-- `integrations/square-catalog-worker/wrangler.toml`
 - `_includes/square-catalog.html`
-- `assets/js/main.js`
+- `README.md`
 - `docs/square-catalog.md`
 - `docs/architecture.md`
 - `docs/decisions.md`
-- Square Checkout API and Cloudflare Workers
+- Square Catalog, Inventory, and Checkout APIs; Cloudflare Workers
 
 ## Plan of Work
 
-1. Add failing Worker tests for a fixed shipping fee and invalid configuration.
-2. Validate `SHIPPING_FEE_CENTS` and include a USD `shipping_fee` in `CreatePaymentLink` while preserving address collection.
-3. Add concise, accessible shipping disclosure and correct the post-checkout message.
-4. Document the manual Square fulfillment workflow and the flat-rate decision.
-5. Run Worker tests, Jekyll build, focused browser checks, diffs, and repository safety checks.
-6. Deploy the Worker, verify production checkout behavior without completing a charge, then commit the finished repository changes on `main`.
+1. Add red-first tests for weight serialization, configuration errors, every rate boundary, free shipping, weighted carts, mixed carts, and Square payloads.
+2. Add and validate `shipping-rates.json`, extract the Square custom weight, and calculate checkout shipping from current catalog data.
+3. Remove the country confirmation, preserve address collection, and update storefront copy.
+4. Update the human runbook, stable architecture, ADR ledger, and progress record.
+5. Run Worker tests, the Jekyll build, focused source checks, and repository safety checks.
+6. Deploy the Worker and verify production catalog and checkout behavior without completing a charge, then commit the finished repository changes on `main`.
 
 ## Validation and Acceptance
 
-- `npm test --prefix integrations/square-catalog-worker` passes, including red-first tests for missing, malformed, zero, and over-limit fees.
+- `npm test --prefix integrations/square-catalog-worker` passes and each handled configuration error has a test.
 - `bundle exec jekyll build` completes without warnings.
-- `/books/` shows the $5.00 flat-rate disclosure at desktop and mobile widths and remains keyboard-readable.
-- A production payment link shows a $5.00 shipping line and requires a shipping address. Do not submit payment during automated verification.
-- The Worker deploy succeeds and the repository remains free of secrets and unrelated changes.
+- `/books/` accurately says shipping is calculated at checkout and does not promise US-only enforcement.
+- Production `/catalog` includes `w`; a checkout link collects an address, has no `YES` field, and charges the expected configured rate.
+- The repository remains free of secrets and unrelated changes.
 
 ## Idempotence and Recovery
 
-Worker deployment is repeatable from the same commit. If validation fails, do not publish repository changes. Roll back the Worker by redeploying the previous known-good version. Change the rate by updating `SHIPPING_FEE_CENTS` and redeploying.
-
-## Open Questions
-
-None. The user delegated the implementation choices, and the fixed-rate assumption minimizes operational burden.
+Worker deployment is repeatable from the same commit. Roll back by redeploying the previous known-good Worker version. Change rates in `shipping-rates.json`, run tests, and redeploy. A missing custom weight safely falls back to per-item shipping.
 
 ## Task Progress
 
-- [x] Initial planning and Square contract review.
+- [x] Plan review and Square contract research.
 - [x] Red-first Worker tests.
-- [x] Worker and storefront implementation.
+- [x] Worker, configuration, and storefront implementation.
 - [x] Operational and architectural documentation.
-- [x] Local and browser validation.
-- [x] Worker deployment and production verification.
+- [x] Local validation.
+- [x] Worker deployment.
+- [ ] Production verification.
 - [x] Commit on `main`.
 
 ## Outcomes
 
-- A flat per-order fee is deliberately preferred over a carrier integration because the catalog has no reliable package weights and the shop needs a low-maintenance workflow.
-- Plan review confirmed that shipping validation belongs at the start of checkout so catalog reads remain independent and misconfigured checkout fails before contacting Square.
-- Five new tests failed against the previous checkout behavior and all Worker tests passed after the shipping implementation.
-- Jekyll built successfully in the maintained Docker image, and browser checks confirmed the disclosure stays within the cart at desktop and mobile widths.
-- Cloudflare OAuth succeeded; the authenticated login exposed multiple accounts, so `wrangler.toml` now pins the non-secret Hermeticus Bookshop account ID.
-- Production checkout showed the correct $5.00 shipping line and required address fields, but also exposed Square's global country selector. Square has no Checkout API country allowlist, so the US-only policy is now disclosed on both checkout surfaces and must be verified during fulfillment.
-- Square stripped policy text from a custom field that resembled its built-in order-notes label. The field is now a required, explicit `YES` confirmation instead of optional notes.
-- Production Worker version `ce4de605-3879-4a06-97c8-542eb6c7b413` rendered the $5.00 shipping charge, required US-only confirmation, required shipping address, and correct order total without submitting payment.
+- Square-reviewed documentation confirms that the native Dashboard weight is unavailable in the Catalog API; the seller-visible catalog custom attribute is the supported bridge.
+- The calculation treats only weights from 0 through 0.1 lb as free. Invalid negative weights fall back to per-item shipping instead of accidentally granting free shipping.
+- The expanded suite fails against the flat-rate implementation because the new calculation exports and behavior do not yet exist.
+- The implementation versions the catalog cache key so existing cached payloads without `w` cannot survive deployment.
+- Fourteen Worker tests now pass, including all quantity tiers, threshold boundaries, the requested mixed-order example, free-only checkout, trusted weight extraction, and unsafe-money rejection.
+- Wrangler bundled the JSON module successfully, and the Dockerized Jekyll build completed. Host Ruby lacks the locked Bundler version, so the maintained Docker environment supplied the site build.
+- Cloudflare deployed Worker version `d962bbad-8931-4e0a-91dd-62f9efc9acb2`. The required live HTTP smoke test is still pending because the execution environment rejected the outbound verification command after reaching its approval usage limit.

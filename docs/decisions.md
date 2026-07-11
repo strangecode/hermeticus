@@ -45,3 +45,8 @@ Consequences: Buyers keep their place across reloads with minimal implementation
 Context: Physical books need a paid shipping charge and deliverable address, but the catalog has no reliable package weights and a carrier-rate integration would add credentials and operational failure modes.
 Decision: Charge a configurable $5.00 USD flat rate for US orders, disclose the country limitation on Hermeticus, require buyer confirmation and address collection on Square, and use Square Orders Manager as the fulfillment source of truth.
 Consequences: Checkout remains simple and customer addresses stay out of Hermeticus, but Square cannot enforce a country allowlist. The shop must verify the destination, refund out-of-scope orders, absorb domestic rate differences, keep disclosures synchronized with Worker configuration, and complete paid fulfillments manually.
+
+## 2026-07-10 – Replace flat shipping with catalog-aware rules
+Context: The flat rate overcharges postcards and undercharges unusually heavy products, while Square's public Catalog API does not expose the native Dashboard shipping-weight field or Dashboard shipping profiles.
+Decision: Supersede the flat-rate decision with a validated JSON rate table and a seller-visible `Shipping weight (lb)` catalog custom attribute. Use per-item defaults when weight is absent, weight pricing when present, free shipping through weights at or below 0.1 lb, and the higher candidate for mixed carts.
+Consequences: Typical books work without item setup and rate changes stay in one file. Sellers must use the custom attribute rather than Square's native weight for this checkout, fractional calculated cents round up, and non-US orders still require cancellation because hosted checkout accepts all countries.
