@@ -144,6 +144,15 @@ Expected result:
 - HTTP `200`
 - JSON containing `u`
 - the `u` value opens a Square-hosted checkout page
+- the checkout page prompts the buyer for a shipping address (the order is
+  created with a `SHIPMENT` fulfillment) and shows an optional "Order notes"
+  field
+
+Shipping collection is driven entirely by the `CreatePaymentLink` request
+(`checkout_options.ask_for_shipping_address`), not by Square dashboard
+settings. After the buyer pays, the address arrives on the order in
+`fulfillments[].shipment_details`, and any note in the optional field is
+returned with the order.
 
 ### Public Site
 

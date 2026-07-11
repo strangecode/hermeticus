@@ -176,6 +176,8 @@ async function createPaymentLink(lineItems, env, fetchImpl) {
         },
         checkout_options: {
           redirect_url: `${getPrimaryOrigin(env)}/books/?checkout=success`,
+          ask_for_shipping_address: true,
+          custom_fields: [{ title: "Order notes (optional)" }],
         },
       }),
     },

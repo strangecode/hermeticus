@@ -133,6 +133,77 @@ test("parseCheckoutBody rejects duplicate variation ids", async () => {
   await assert.rejects(parseCheckoutBody(request), /duplicated/i);
 });
 
+test("checkout asks Square for a shipping address and an order-notes field", async () => {
+  const paymentLinkBodies = [];
+  const fetchImpl = async (url, init) => {
+    if (url.includes("/v2/catalog/list")) {
+      return new Response(JSON.stringify({
+        objects: [
+          {
+            id: "item-1",
+            type: "ITEM",
+            item_data: {
+              name: "A Field Guide to the Aether",
+              variations: [
+                {
+                  id: "variation-1",
+                  item_variation_data: {
+                    price_money: { amount: 2000 },
+                    sellable: true,
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      }));
+    }
+
+    if (url.includes("/v2/inventory/counts/batch-retrieve")) {
+      return new Response(JSON.stringify({
+        counts: [{ catalog_object_id: "variation-1", quantity: "5" }],
+      }));
+    }
+
+    if (url.includes("/v2/online-checkout/payment-links")) {
+      paymentLinkBodies.push(JSON.parse(init.body));
+      return new Response(JSON.stringify({
+        payment_link: { url: "https://square.link/u/checkout" },
+      }));
+    }
+
+    assert.fail(`Unexpected Square request: ${url}`);
+  };
+
+  const request = new Request("https://worker.example/checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "https://hermeticus.org",
+    },
+    body: JSON.stringify({ items: [{ v: "variation-1", q: 2 }] }),
+  });
+
+  const response = await safeHandleRequest(
+    request,
+    {
+      ALLOWED_ORIGINS: "https://hermeticus.org",
+      SQUARE_ACCESS_TOKEN: "token",
+      SQUARE_LOCATION_ID: "location",
+    },
+    { waitUntil() {} },
+    { fetchImpl },
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { u: "https://square.link/u/checkout" });
+
+  assert.equal(paymentLinkBodies.length, 1);
+  const { checkout_options: checkoutOptions } = paymentLinkBodies[0];
+  assert.equal(checkoutOptions.ask_for_shipping_address, true);
+  assert.deepEqual(checkoutOptions.custom_fields, [{ title: "Order notes (optional)" }]);
+});
+
 test("safeHandleRequest returns cached catalog with CORS headers", async () => {
   const cache = {
     async match() {
