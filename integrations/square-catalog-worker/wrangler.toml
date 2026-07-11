@@ -1,4 +1,5 @@
 name = "hermeticus-square-catalog"
+account_id = "34d59abc70bce4fecc65fd63b6100372"
 main = "src/index.js"
 compatibility_date = "2026-04-22"
 
@@ -8,3 +9,4 @@ SQUARE_ENV = "production"
 CATALOG_TTL_SECONDS = "300"
 SQUARE_VERSION = "2026-01-22"
 SQUARE_LOCATION_ID = "L417PBT77ZMTG"
+SHIPPING_FEE_CENTS = "500"

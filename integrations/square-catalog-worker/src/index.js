@@ -3,6 +3,7 @@ const DEFAULT_SQUARE_VERSION = "2026-01-22";
 const SQUARE_TYPES = "ITEM,CATEGORY,IMAGE";
 const MAX_CART_LINES = 50;
 const MAX_INVENTORY_BATCH = 1000;
+const MAX_SHIPPING_FEE_CENTS = 10000;
 
 export default {
   async fetch(request, env, ctx) {
@@ -71,11 +72,16 @@ async function handleCatalogRequest(request, env, ctx, runtime, allowedOrigin) {
 
 async function handleCheckoutRequest(request, env, runtime, allowedOrigin) {
   const cart = await parseCheckoutBody(request);
+  const shippingFee = Number(env.SHIPPING_FEE_CENTS);
+  if (!Number.isInteger(shippingFee) || shippingFee < 1 || shippingFee > MAX_SHIPPING_FEE_CENTS) {
+    throw createHttpError(500, "Worker configuration has an invalid SHIPPING_FEE_CENTS.");
+  }
+
   const liveCatalog = await loadPublicCatalog(env, runtime.fetchImpl);
   const itemByVariationId = new Map(liveCatalog.map((item) => [item.v, item]));
   const lineItems = cart.items.map((item) => validateCartLine(item, itemByVariationId));
 
-  const paymentLink = await createPaymentLink(lineItems, env, runtime.fetchImpl);
+  const paymentLink = await createPaymentLink(lineItems, shippingFee, env, runtime.fetchImpl);
   return withCors(jsonResponse({ u: paymentLink }), allowedOrigin);
 }
 
@@ -159,7 +165,7 @@ async function fetchInventoryCounts(variationIds, env, fetchImpl) {
   return inventory;
 }
 
-async function createPaymentLink(lineItems, env, fetchImpl) {
+async function createPaymentLink(lineItems, shippingFee, env, fetchImpl) {
   const url = new URL("/v2/online-checkout/payment-links", getSquareBaseUrl(env));
   const payload = await squareJson(
     url,
@@ -177,7 +183,14 @@ async function createPaymentLink(lineItems, env, fetchImpl) {
         checkout_options: {
           redirect_url: `${getPrimaryOrigin(env)}/books/?checkout=success`,
           ask_for_shipping_address: true,
-          custom_fields: [{ title: "Order notes (optional)" }],
+          custom_fields: [{ title: "US shipping only - type YES to confirm" }],
+          shipping_fee: {
+            name: "Flat-rate shipping",
+            charge: {
+              amount: shippingFee,
+              currency: "USD",
+            },
+          },
         },
       }),
     },

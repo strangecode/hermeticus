@@ -133,7 +133,42 @@ test("parseCheckoutBody rejects duplicate variation ids", async () => {
   await assert.rejects(parseCheckoutBody(request), /duplicated/i);
 });
 
-test("checkout asks Square for a shipping address and an order-notes field", async () => {
+for (const [label, shippingFee] of [
+  ["missing", undefined],
+  ["not an integer", "five dollars"],
+  ["zero", "0"],
+  ["over the safety limit", "10001"],
+]) {
+  test(`checkout rejects a ${label} shipping fee before contacting Square`, async () => {
+    const request = new Request("https://worker.example/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://hermeticus.org",
+      },
+      body: JSON.stringify({ items: [{ v: "variation-1", q: 1 }] }),
+    });
+
+    const response = await safeHandleRequest(
+      request,
+      {
+        ALLOWED_ORIGINS: "https://hermeticus.org",
+        SHIPPING_FEE_CENTS: shippingFee,
+        SQUARE_ACCESS_TOKEN: "token",
+        SQUARE_LOCATION_ID: "location",
+      },
+      { waitUntil() {} },
+      { fetchImpl: async () => assert.fail("Square must not be called") },
+    );
+
+    assert.equal(response.status, 500);
+    assert.deepEqual(await response.json(), {
+      error: "Worker configuration has an invalid SHIPPING_FEE_CENTS.",
+    });
+  });
+}
+
+test("checkout charges flat-rate shipping and asks for a shipping address", async () => {
   const paymentLinkBodies = [];
   const fetchImpl = async (url, init) => {
     if (url.includes("/v2/catalog/list")) {
@@ -188,6 +223,7 @@ test("checkout asks Square for a shipping address and an order-notes field", asy
     request,
     {
       ALLOWED_ORIGINS: "https://hermeticus.org",
+      SHIPPING_FEE_CENTS: "500",
       SQUARE_ACCESS_TOKEN: "token",
       SQUARE_LOCATION_ID: "location",
     },
@@ -201,7 +237,14 @@ test("checkout asks Square for a shipping address and an order-notes field", asy
   assert.equal(paymentLinkBodies.length, 1);
   const { checkout_options: checkoutOptions } = paymentLinkBodies[0];
   assert.equal(checkoutOptions.ask_for_shipping_address, true);
-  assert.deepEqual(checkoutOptions.custom_fields, [{ title: "Order notes (optional)" }]);
+  assert.deepEqual(checkoutOptions.custom_fields, [{ title: "US shipping only - type YES to confirm" }]);
+  assert.deepEqual(checkoutOptions.shipping_fee, {
+    name: "Flat-rate shipping",
+    charge: {
+      amount: 500,
+      currency: "USD",
+    },
+  });
 });
 
 test("safeHandleRequest returns cached catalog with CORS headers", async () => {

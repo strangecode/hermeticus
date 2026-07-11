@@ -40,3 +40,8 @@ Consequences: Sellers must keep inventory tracking enabled for books they want o
 Context: The books page needed a more forgiving shopping flow, but this site remains a static Jekyll frontend with a tiny low-volume catalog and no appetite for extra backend state.
 Decision: Persist the cart only in browser `localStorage`, reconcile it against the latest live catalog on load, and silently discard invalid saved lines instead of introducing server-side cart storage or elaborate recovery flows.
 Consequences: Buyers keep their place across reloads with minimal implementation complexity, but cart state remains device-local and should always be treated as convenience state rather than authoritative inventory state.
+
+## 2026-07-10 – Use flat-rate shipping and Square fulfillment
+Context: Physical books need a paid shipping charge and deliverable address, but the catalog has no reliable package weights and a carrier-rate integration would add credentials and operational failure modes.
+Decision: Charge a configurable $5.00 USD flat rate for US orders, disclose the country limitation on Hermeticus, require buyer confirmation and address collection on Square, and use Square Orders Manager as the fulfillment source of truth.
+Consequences: Checkout remains simple and customer addresses stay out of Hermeticus, but Square cannot enforce a country allowlist. The shop must verify the destination, refund out-of-scope orders, absorb domestic rate differences, keep disclosures synchronized with Worker configuration, and complete paid fulfillments manually.

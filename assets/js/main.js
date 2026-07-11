@@ -25,7 +25,7 @@
     "ul",
   ]);
   const EMPTY_CART_MESSAGE = "Add an item to begin checkout.";
-  const SUCCESS_MESSAGE = "Thanks. We've received your order and can now fulfill it.";
+  const SUCCESS_MESSAGE = "Thanks. Your payment is complete, and we'll prepare your books for shipping.";
   const apiBase = (root.getAttribute("data-api-base") || "").trim().replace(/\/$/, "");
   const statusNode = root.querySelector("[data-catalog-status]");
   const layoutNode = root.querySelector("[data-catalog-layout]");

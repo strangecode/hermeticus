@@ -46,8 +46,9 @@ Hermeticus is a static Jekyll site deployed on GitHub Pages at `https://hermetic
 7. Client-side search, category filtering, and sorting run entirely against the already loaded catalog array without further network requests.
 8. The browser persists cart lines in `localStorage`, reconciles them against the freshly loaded catalog on page load, and silently drops lines that are no longer valid.
 9. When the buyer checks out, `assets/js/main.js` sends `POST <worker>/checkout` with variation IDs and requested quantities.
-10. The worker bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, and creates a Square-hosted payment link.
-11. The browser redirects the buyer to Square’s checkout page. On a `?checkout=success` return, the client clears the saved cart and shows a success message.
+10. The worker validates the configured flat shipping fee, bypasses the cached public payload, rebuilds current live availability from Square, validates the cart, and creates a Square-hosted payment link with the shipping charge and required address collection.
+11. The browser redirects the buyer to Square’s checkout page. Square stores the paid buyer's address in a `SHIPMENT` fulfillment. On a `?checkout=success` return, the client clears the saved cart and shows a payment-complete message.
+12. The shop ships the books and manually completes the paid fulfillment in Square Orders Manager.
 
 The public catalog payload uses these keys:
 
@@ -76,6 +77,7 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
   - `SQUARE_LOCATION_ID`
   - `CATALOG_TTL_SECONDS`
   - `SQUARE_VERSION`
+  - `SHIPPING_FEE_CENTS`
 - Site-side worker location is configured in `_config.yml` through `square_catalog_api_base`.
 - External runtime dependencies:
   - GitHub Pages / Jekyll
@@ -86,6 +88,10 @@ The checkout payload returns `{ "u": "<square-checkout-url>" }` on success.
 
 - The public Git repository contains no Square or Cloudflare secrets.
 - Payment card entry never happens on `hermeticus.org`; buyers complete payment on Square-hosted checkout.
+- Customer shipping addresses remain in Square and are not stored by Hermeticus.
+- Checkout must fail before contacting Square when `SHIPPING_FEE_CENTS` is not an integer from 1 through 10000.
+- The customer-facing shipping disclosure and Worker shipping fee must remain equal.
+- The flat rate applies to US addresses. Square cannot enforce a hosted-checkout country allowlist, so the policy is disclosed before checkout, confirmed in a required Square field, and verified before fulfillment.
 - Only items with exactly one sellable variation and positive tracked inventory at the configured Square location are published on `/books/`.
 - Items with zero inventory or archived state disappear from the public catalog after cache refresh.
 - `GET /catalog` is cacheable; `POST /checkout` must validate against fresh Square data before creating a checkout link.

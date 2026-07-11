@@ -110,3 +110,8 @@ Suggested entry format:
 - summary: Made the Events page scheduling dynamic as progressive enhancement. Extracted the card to `_includes/event-card.html`, rewrote `pages/events.md` to render build-time Upcoming/Past sections (30-day retention), and added a self-guarded IIFE to `assets/js/main.js` that re-buckets events by the visitor's current date (past the day after the event date, hidden after 30 days), sorts each list, and toggles section/empty-state visibility. Added section spacing and a `[hidden]` safety rule in `_sass/_components.scss`.
 - reason: On a static Jekyll site the build-time split goes stale between deploys; JS keeps Upcoming/Past correct on every visit while the no-JS baseline still works.
 - follow-up: The retention window lives in two synced places — `retention_days` in `pages/events.md` and `data-events-retention-days` on the wrapper; keep them equal. Categorization logic is duplicated in Liquid (build) and JS (runtime) by design.
+
+## 2026-07-10 – P-005 – complete-shippable-square-checkout – partial
+- summary: Added red-first coverage and implementation for a guarded $5.00 US flat shipping charge, required address collection and US-policy confirmation on Square, disclosed the rate in the cart, documented manual fulfillment, and deployed the Worker. A production checkout confirmed the shipping line, required fields, and total without payment.
+- reason: Address collection alone did not calculate or charge shipping, and paid payment-link fulfillments require an explicit seller workflow.
+- follow-up: Archive P-005 after user confirmation.
