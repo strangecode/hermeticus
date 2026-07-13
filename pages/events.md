@@ -24,7 +24,7 @@ disable_prose: true
 {%- assign past_count = 0 -%}
 {%- for event in sorted -%}
   {%- assign ev_s = event.date | date: "%s" | plus: 0 -%}
-  {%- if ev_s >= today_s -%}
+  {%- if event.recurs or ev_s >= today_s -%}
     {%- assign upcoming_count = upcoming_count | plus: 1 -%}
   {%- elsif ev_s >= cutoff_s -%}
     {%- assign past_count = past_count | plus: 1 -%}
@@ -37,7 +37,7 @@ disable_prose: true
     <ul class="event-list" role="list" data-events-list="upcoming">
       {%- for event in sorted -%}
         {%- assign ev_s = event.date | date: "%s" | plus: 0 -%}
-        {%- if ev_s >= today_s -%}{% include event-card.html event=event %}{%- endif -%}
+        {%- if event.recurs or ev_s >= today_s -%}{% include event-card.html event=event %}{%- endif -%}
       {%- endfor -%}
     </ul>
     <p class="events-empty" data-events-empty="upcoming"{% if upcoming_count != 0 %} hidden{% endif %}>
@@ -51,7 +51,7 @@ disable_prose: true
       {%- assign recent_first = sorted | reverse -%}
       {%- for event in recent_first -%}
         {%- assign ev_s = event.date | date: "%s" | plus: 0 -%}
-        {%- if ev_s < today_s and ev_s >= cutoff_s -%}{% include event-card.html event=event %}{%- endif -%}
+        {%- if event.recurs == nil and ev_s < today_s and ev_s >= cutoff_s -%}{% include event-card.html event=event %}{%- endif -%}
       {%- endfor -%}
     </ul>
   </section>

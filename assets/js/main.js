@@ -862,6 +862,11 @@
   const past = [];
 
   items.forEach(function (item) {
+    // Recurring events are an ongoing series: always Upcoming, never aged out.
+    if (item.getAttribute("data-event-recurring") === "true") {
+      upcoming.push({ item: item, date: parseEventDate(item.getAttribute("data-event-date")) || todayMidnight });
+      return;
+    }
     const date = parseEventDate(item.getAttribute("data-event-date"));
     if (!date) {
       return; // Leave anything unparseable exactly where the build placed it.

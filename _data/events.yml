@@ -9,6 +9,11 @@
 #   description: optional. One short paragraph.
 #   image:       optional. Path under /assets/images/…; rendered as a photo when present.
 #   image_alt:   optional but required when `image` is set. Describes the photo.
+#   recurs:      optional. Human-readable recurrence, e.g. "Every Tuesday and
+#                Thursday". When set, the event is treated as an ongoing series:
+#                it always shows under Upcoming and never ages into Past. Use
+#                `date` as the series start (it anchors sort order). Shown in
+#                place of a single calendar date.
 - title: Open Mike Poetry Reading
   date: 2026-07-17
   time: "7:00 pm"
@@ -23,6 +28,7 @@
     Bookshop, the shop's front window and book-lined shelves behind them.
 - title: "Alchemical Influences in William Blake"
   date: 2026-07-21
+  recurs: Every Tuesday and Thursday
   time: "7:00–8:30 pm"
   location: Hermeticus Bookshop, 469 B Street, Ashland, Oregon 97520
   cost: By donation · Scholarships available
@@ -30,20 +36,7 @@
     A brief history of alchemy for William Blake. This class covers those
     alchemists important to the development of Blake's world-view, and
     influential to differing degrees in his artistic, visionary, and poetic
-    output. An ongoing class offered by donation to support Allen's study,
-    preparation, and eagerness to share his love of Blake; scholarships are
-    available for qualifying students. This first session is offered on two
-    evenings — Tuesday, July 21 and Thursday, July 23.
-- title: "Alchemical Influences in William Blake"
-  date: 2026-07-23
-  time: "7:00–8:30 pm"
-  location: Hermeticus Bookshop, 469 B Street, Ashland, Oregon 97520
-  cost: By donation · Scholarships available
-  description: >-
-    A brief history of alchemy for William Blake. This class covers those
-    alchemists important to the development of Blake's world-view, and
-    influential to differing degrees in his artistic, visionary, and poetic
-    output. An ongoing class offered by donation to support Allen's study,
-    preparation, and eagerness to share his love of Blake; scholarships are
-    available for qualifying students. This first session is offered on two
-    evenings — Tuesday, July 21 and Thursday, July 23.
+    output. An ongoing class meeting every Tuesday and Thursday evening,
+    offered by donation to support Allen's study, preparation, and eagerness to
+    share his love of Blake; scholarships are available for qualifying students.
+    Newcomers are welcome at any session.

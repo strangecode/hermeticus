@@ -5,7 +5,7 @@
   into Upcoming / Past by the visitor's current date. With JS disabled, the
   build-time placement in pages/events.md stands.
 {%- endcomment -%}
-<li data-event-date="{{ include.event.date | date: '%Y-%m-%d' }}">
+<li data-event-date="{{ include.event.date | date: '%Y-%m-%d' }}"{% if include.event.recurs %} data-event-recurring="true"{% endif %}>
   <article class="event-card{% if include.event.image %} event-card--media{% endif %}">
     {%- if include.event.image -%}
     <figure class="event-card__media">
@@ -18,7 +18,7 @@
     {%- endif -%}
     <div class="event-card__body">
       <p class="event-card__when">
-        <time datetime="{{ include.event.date | date: '%Y-%m-%d' }}">{{ include.event.date | date: "%A, %B %-d, %Y" }}</time>{% if include.event.time %}<span class="event-card__time"> &middot; {{ include.event.time }}</span>{% endif %}
+        {%- if include.event.recurs -%}<span class="event-card__recurs">{{ include.event.recurs }}</span>{%- else -%}<time datetime="{{ include.event.date | date: '%Y-%m-%d' }}">{{ include.event.date | date: "%A, %B %-d, %Y" }}</time>{%- endif -%}{% if include.event.time %}<span class="event-card__time"> &middot; {{ include.event.time }}</span>{% endif %}
       </p>
       <h3 class="event-card__title">{{ include.event.title }}</h3>
       {%- if include.event.location or include.event.cost -%}
