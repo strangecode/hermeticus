@@ -10,35 +10,19 @@ A simple static website for Hermeticus Bookshop, built with
 
 ## Local preview
 
-Prerequisites: Ruby &ge; 3.1 and [Bundler](https://bundler.io/).
+Prerequisite: [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```sh
-bundle install
-bundle exec jekyll serve --livereload
+docker compose up --build
 ```
 
-The site is then available at <http://127.0.0.1:4000/>.
-
-## Local preview with Docker
-
-If you do not want Ruby and gems installed into your host environment, use the
-repo-local Docker setup instead.
+The Jekyll preview is available at <http://127.0.0.1:4000/> and rebuilds when files change. Ruby and the required gems stay inside the Docker image instead of being installed on the host.
 
 ```sh
-npm run docker:up
+docker compose down
 ```
 
-The Jekyll preview is then available at <http://127.0.0.1:4000/> and
-the site rebuilds on file changes.
-
-The compose setup bind-mounts the repo source into the container, while Ruby
-and gems are baked into the image instead of your host environment.
-
-If you change `Gemfile` or `Gemfile.lock`, rebuild the image:
-
-```sh
-npm run docker:up
-```
+Run the final command from another terminal to stop the preview.
 
 ## Project layout
 
