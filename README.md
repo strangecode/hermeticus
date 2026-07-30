@@ -50,6 +50,8 @@ Non-interactive deploys require `CLOUDFLARE_API_TOKEN` in the environment.
 
 ## Shipping prices
 
+See the full [Shipping Price Guide](./docs/shipping-prices.md).
+
 The Worker calculates shipping from [`integrations/square-catalog-worker/shipping-rates.json`](./integrations/square-catalog-worker/shipping-rates.json). Money values in that file are US cents. To change the prices, edit the JSON, run the Worker tests, and redeploy:
 
 ```sh
