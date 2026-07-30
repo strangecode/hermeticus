@@ -16,7 +16,7 @@ Prerequisite: [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 docker compose up --build
 ```
 
-The Jekyll preview is available at <http://127.0.0.1:4000/> and rebuilds when files change. Ruby and the required gems stay inside the Docker image instead of being installed on the host.
+Open the Jekyll preview at <http://127.0.0.1:4000/> and use that exact address instead of `http://localhost:4000`, which the catalog Worker does not allow. The preview rebuilds when files change. Ruby and the required gems stay inside the Docker image instead of being installed on the host.
 
 ```sh
 docker compose down
