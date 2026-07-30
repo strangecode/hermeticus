@@ -10,19 +10,15 @@ A simple static website for Hermeticus Bookshop, built with
 
 ## Local preview
 
-Prerequisite: [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+Prerequisite: Docker
 
 ```sh
 docker compose up --build
-```
-
-Open the Jekyll preview at <http://127.0.0.1:4000/> and use that exact address instead of `http://localhost:4000`, which the catalog Worker does not allow. The preview rebuilds when files change. Ruby and the required gems stay inside the Docker image instead of being installed on the host.
-
-```sh
+# Preview and dev locally…
 docker compose down
 ```
 
-Run the final command from another terminal to stop the preview.
+Open the Jekyll preview at <http://127.0.0.1:4000/> and use that exact address instead of `http://localhost:4000`, which the catalog Worker blocks because of CORS. The preview rebuilds when files change. Ruby and the required gems stay inside the Docker image.
 
 ## Project layout
 
